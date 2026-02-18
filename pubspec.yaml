@@ -1,0 +1,95 @@
+name: sanbao_flutter
+description: "Sanbao - AI platform mobile client"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^14.6.2
+
+  # Networking
+  dio: ^5.7.0
+
+  # Code generation annotations
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Secure storage
+  flutter_secure_storage: ^9.2.2
+
+  # Markdown rendering
+  flutter_markdown: ^0.7.4+3
+
+  # Image caching
+  cached_network_image: ^3.4.1
+
+  # File picking
+  image_picker: ^1.1.2
+  file_picker: ^8.1.3
+
+  # Voice input
+  speech_to_text: ^7.0.0
+
+  # Biometric auth
+  local_auth: ^2.3.0
+
+  # URL handling
+  url_launcher: ^6.3.1
+
+  # Sharing
+  share_plus: ^10.1.2
+
+  # Animations
+  flutter_animate: ^4.5.0
+
+  # Google Sign-In
+  google_sign_in: ^6.2.2
+
+  # Error tracking
+  sentry_flutter: ^9.0.0
+
+  # Local paths
+  path_provider: ^2.1.5
+
+  # Permissions
+  permission_handler: ^11.3.1
+
+  # Shimmer loading
+  shimmer: ^3.0.0
+
+  # Connectivity
+  connectivity_plus: ^6.1.0
+
+  # Shared preferences
+  shared_preferences: ^2.3.3
+
+  # Intl for localization
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.13
+  riverpod_generator: ^2.6.2
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  # fonts will be added when font files are available

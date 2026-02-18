@@ -1,0 +1,151 @@
+{
+  "@@locale": "ru",
+
+  "appName": "Sanbao",
+  "appDescription": "AI-платформа для профессионалов",
+
+  "loginTitle": "Вход",
+  "loginEmail": "Email",
+  "loginPassword": "Пароль",
+  "loginButton": "Войти",
+  "loginWithGoogle": "Войти через Google",
+  "loginForgotPassword": "Забыли пароль?",
+  "loginNoAccount": "Нет аккаунта?",
+  "loginSignUp": "Зарегистрироваться",
+
+  "registerTitle": "Регистрация",
+  "registerName": "Имя",
+  "registerEmail": "Email",
+  "registerPassword": "Пароль",
+  "registerConfirmPassword": "Подтвердите пароль",
+  "registerButton": "Зарегистрироваться",
+  "registerHasAccount": "Уже есть аккаунт?",
+  "registerSignIn": "Войти",
+
+  "chatTitle": "Диалоги",
+  "chatNewChat": "Новый диалог",
+  "chatInputPlaceholder": "Введите сообщение...",
+  "chatSend": "Отправить",
+  "chatThinking": "Думает...",
+  "chatSearching": "Ищет в интернете...",
+  "chatUsingTool": "Использует инструмент...",
+  "chatEmpty": "Начните новый диалог",
+  "chatEmptyDescription": "Задайте вопрос или выберите агента для начала работы",
+  "chatDeleteConfirm": "Удалить диалог?",
+  "chatDeleteMessage": "Это действие нельзя отменить",
+  "chatPinned": "Закреплённые",
+  "chatArchived": "Архив",
+
+  "groupToday": "Сегодня",
+  "groupYesterday": "Вчера",
+  "groupThisWeek": "Эта неделя",
+  "groupEarlier": "Ранее",
+
+  "agentsTitle": "Агенты",
+  "agentsEmpty": "Нет доступных агентов",
+  "agentsCreate": "Создать агента",
+
+  "skillsTitle": "Скиллы",
+  "skillsEmpty": "Нет доступных скиллов",
+
+  "profileTitle": "Профиль",
+  "profileLogout": "Выйти",
+  "profileLogoutConfirm": "Выйти из аккаунта?",
+
+  "settingsTitle": "Настройки",
+  "settingsTheme": "Тема",
+  "settingsThemeSystem": "Системная",
+  "settingsThemeLight": "Светлая",
+  "settingsThemeDark": "Тёмная",
+  "settingsLanguage": "Язык",
+  "settingsNotifications": "Уведомления",
+  "settingsHapticFeedback": "Вибрация",
+  "settingsBiometric": "Биометрическая аутентификация",
+  "settingsTextScale": "Размер текста",
+  "settingsThinkingMode": "Режим рассуждений",
+  "settingsWebSearch": "Веб-поиск",
+  "settingsPlanningMode": "Режим планирования",
+
+  "billingTitle": "Тариф",
+  "billingCurrentPlan": "Текущий тариф",
+  "billingUpgrade": "Улучшить тариф",
+  "billingUsage": "Использование",
+  "billingMessages": "Сообщений сегодня",
+  "billingTokens": "Токенов в месяц",
+
+  "commonCancel": "Отмена",
+  "commonConfirm": "Подтвердить",
+  "commonSave": "Сохранить",
+  "commonDelete": "Удалить",
+  "commonEdit": "Редактировать",
+  "commonCopy": "Копировать",
+  "commonShare": "Поделиться",
+  "commonRetry": "Повторить",
+  "commonLoading": "Загрузка...",
+  "commonError": "Ошибка",
+  "commonSuccess": "Успешно",
+  "commonSearch": "Поиск",
+  "commonMore": "Ещё",
+  "commonClose": "Закрыть",
+  "commonBack": "Назад",
+  "commonNext": "Далее",
+  "commonDone": "Готово",
+  "commonAll": "Все",
+  "commonNone": "Нет",
+
+  "errorNetwork": "Нет подключения к интернету",
+  "errorServer": "Ошибка сервера. Попробуйте позже",
+  "errorTimeout": "Превышено время ожидания",
+  "errorAuth": "Сессия истекла. Войдите снова",
+  "errorPermission": "Доступ запрещён",
+  "errorNotFound": "Ресурс не найден",
+  "errorRateLimit": "Слишком много запросов. Подождите",
+  "errorUnknown": "Произошла неизвестная ошибка",
+  "errorValidation": "Проверьте введённые данные",
+
+  "fileAttach": "Прикрепить файл",
+  "fileImage": "Фото",
+  "fileDocument": "Документ",
+  "fileCamera": "Камера",
+  "fileSizeLimit": "Максимальный размер файла: {size}",
+  "@fileSizeLimit": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+
+  "voiceRecord": "Запись голоса",
+  "voiceListening": "Слушаю...",
+  "voiceStop": "Остановить",
+
+  "copiedToClipboard": "Скопировано в буфер обмена",
+  "shareVia": "Поделиться через",
+
+  "artifactContract": "Договор",
+  "artifactClaim": "Исковое заявление",
+  "artifactComplaint": "Жалоба",
+  "artifactDocument": "Документ",
+  "artifactCode": "Код",
+  "artifactAnalysis": "Правовой анализ",
+  "artifactImage": "Изображение",
+
+  "nMessages": "{count,plural, =1{1 сообщение} few{{count} сообщения} other{{count} сообщений}}",
+  "@nMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "nDaysAgo": "{count,plural, =1{1 день назад} few{{count} дня назад} other{{count} дней назад}}",
+  "@nDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

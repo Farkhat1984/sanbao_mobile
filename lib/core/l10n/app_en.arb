@@ -1,0 +1,151 @@
+{
+  "@@locale": "en",
+
+  "appName": "Sanbao",
+  "appDescription": "AI platform for professionals",
+
+  "loginTitle": "Sign In",
+  "loginEmail": "Email",
+  "loginPassword": "Password",
+  "loginButton": "Sign In",
+  "loginWithGoogle": "Sign in with Google",
+  "loginForgotPassword": "Forgot password?",
+  "loginNoAccount": "Don't have an account?",
+  "loginSignUp": "Sign Up",
+
+  "registerTitle": "Sign Up",
+  "registerName": "Name",
+  "registerEmail": "Email",
+  "registerPassword": "Password",
+  "registerConfirmPassword": "Confirm Password",
+  "registerButton": "Sign Up",
+  "registerHasAccount": "Already have an account?",
+  "registerSignIn": "Sign In",
+
+  "chatTitle": "Conversations",
+  "chatNewChat": "New Chat",
+  "chatInputPlaceholder": "Type a message...",
+  "chatSend": "Send",
+  "chatThinking": "Thinking...",
+  "chatSearching": "Searching the web...",
+  "chatUsingTool": "Using a tool...",
+  "chatEmpty": "Start a new conversation",
+  "chatEmptyDescription": "Ask a question or choose an agent to get started",
+  "chatDeleteConfirm": "Delete conversation?",
+  "chatDeleteMessage": "This action cannot be undone",
+  "chatPinned": "Pinned",
+  "chatArchived": "Archived",
+
+  "groupToday": "Today",
+  "groupYesterday": "Yesterday",
+  "groupThisWeek": "This Week",
+  "groupEarlier": "Earlier",
+
+  "agentsTitle": "Agents",
+  "agentsEmpty": "No agents available",
+  "agentsCreate": "Create Agent",
+
+  "skillsTitle": "Skills",
+  "skillsEmpty": "No skills available",
+
+  "profileTitle": "Profile",
+  "profileLogout": "Log Out",
+  "profileLogoutConfirm": "Log out of your account?",
+
+  "settingsTitle": "Settings",
+  "settingsTheme": "Theme",
+  "settingsThemeSystem": "System",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark",
+  "settingsLanguage": "Language",
+  "settingsNotifications": "Notifications",
+  "settingsHapticFeedback": "Haptic Feedback",
+  "settingsBiometric": "Biometric Authentication",
+  "settingsTextScale": "Text Size",
+  "settingsThinkingMode": "Reasoning Mode",
+  "settingsWebSearch": "Web Search",
+  "settingsPlanningMode": "Planning Mode",
+
+  "billingTitle": "Plan",
+  "billingCurrentPlan": "Current Plan",
+  "billingUpgrade": "Upgrade Plan",
+  "billingUsage": "Usage",
+  "billingMessages": "Messages today",
+  "billingTokens": "Tokens this month",
+
+  "commonCancel": "Cancel",
+  "commonConfirm": "Confirm",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonEdit": "Edit",
+  "commonCopy": "Copy",
+  "commonShare": "Share",
+  "commonRetry": "Retry",
+  "commonLoading": "Loading...",
+  "commonError": "Error",
+  "commonSuccess": "Success",
+  "commonSearch": "Search",
+  "commonMore": "More",
+  "commonClose": "Close",
+  "commonBack": "Back",
+  "commonNext": "Next",
+  "commonDone": "Done",
+  "commonAll": "All",
+  "commonNone": "None",
+
+  "errorNetwork": "No internet connection",
+  "errorServer": "Server error. Try again later",
+  "errorTimeout": "Request timed out",
+  "errorAuth": "Session expired. Please sign in again",
+  "errorPermission": "Access denied",
+  "errorNotFound": "Resource not found",
+  "errorRateLimit": "Too many requests. Please wait",
+  "errorUnknown": "An unknown error occurred",
+  "errorValidation": "Please check your input",
+
+  "fileAttach": "Attach File",
+  "fileImage": "Photo",
+  "fileDocument": "Document",
+  "fileCamera": "Camera",
+  "fileSizeLimit": "Maximum file size: {size}",
+  "@fileSizeLimit": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+
+  "voiceRecord": "Voice Recording",
+  "voiceListening": "Listening...",
+  "voiceStop": "Stop",
+
+  "copiedToClipboard": "Copied to clipboard",
+  "shareVia": "Share via",
+
+  "artifactContract": "Contract",
+  "artifactClaim": "Claim",
+  "artifactComplaint": "Complaint",
+  "artifactDocument": "Document",
+  "artifactCode": "Code",
+  "artifactAnalysis": "Legal Analysis",
+  "artifactImage": "Image",
+
+  "nMessages": "{count,plural, =1{1 message} other{{count} messages}}",
+  "@nMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "nDaysAgo": "{count,plural, =1{1 day ago} other{{count} days ago}}",
+  "@nDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}
