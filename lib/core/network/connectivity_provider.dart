@@ -6,11 +6,14 @@
 library;
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/core/config/app_config.dart';
+
+import 'connectivity_reachability.dart'
+    if (dart.library.html) 'connectivity_reachability_web.dart' as reachability;
 
 /// Represents the application's current network connectivity state.
 enum ConnectivityStatus {
@@ -74,26 +77,25 @@ class ConnectivityMonitor {
     return _checkReachability();
   }
 
-  /// Performs a lightweight DNS lookup to verify actual internet access.
+  /// Performs a lightweight reachability check to verify actual internet access.
   ///
-  /// This catches the case where the device is connected to a Wi-Fi
-  /// network that has no internet access (captive portals, etc.).
+  /// On native: DNS lookup via dart:io.
+  /// On web: assumes online (browser handles connectivity).
   Future<ConnectivityStatus> _checkReachability() async {
     try {
-      // Extract the host from the API base URL for the reachability check
       final uri = Uri.tryParse(AppConfig.baseUrl);
       final host = uri?.host ?? 'google.com';
 
-      final result = await InternetAddress.lookup(host)
+      final isReachable = await reachability
+          .checkHost(host)
           .timeout(_reachabilityTimeout);
 
-      if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {
-        return ConnectivityStatus.online;
-      }
-      return ConnectivityStatus.offline;
-    } on SocketException {
-      return ConnectivityStatus.offline;
+      return isReachable
+          ? ConnectivityStatus.online
+          : ConnectivityStatus.offline;
     } on TimeoutException {
+      return ConnectivityStatus.offline;
+    } catch (_) {
       return ConnectivityStatus.offline;
     }
   }

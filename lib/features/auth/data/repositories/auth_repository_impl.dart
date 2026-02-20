@@ -22,6 +22,8 @@ import 'package:sanbao_flutter/features/auth/domain/repositories/auth_repository
 /// - Email/password login with optional 2FA
 /// - Registration
 /// - Google Sign-In
+/// - Apple Sign-In
+/// - WhatsApp OTP
 /// - Token refresh
 /// - Session management
 /// - 2FA setup/enable/disable/verify
@@ -100,6 +102,68 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final result = await _remote.signInWithGoogle(
         idToken: params.idToken,
+      );
+
+      // Persist tokens and cache user
+      await _local.saveTokens(result.tokens);
+      await _local.cacheUser(result.user);
+
+      // Set Sentry user context
+      await ErrorHandler.setUser(
+        id: result.user.id,
+        email: result.user.email,
+        name: result.user.name,
+      );
+
+      return result.user.toEntity();
+    } on ApiException catch (e) {
+      throw ErrorHandler.toFailure(e);
+    }
+  }
+
+  @override
+  Future<User> signInWithApple(AppleSignInParams params) async {
+    try {
+      final result = await _remote.signInWithApple(
+        identityToken: params.identityToken,
+        authorizationCode: params.authorizationCode,
+        email: params.email,
+        fullName: params.fullName,
+        nonce: params.nonce,
+      );
+
+      // Persist tokens and cache user
+      await _local.saveTokens(result.tokens);
+      await _local.cacheUser(result.user);
+
+      // Set Sentry user context
+      await ErrorHandler.setUser(
+        id: result.user.id,
+        email: result.user.email,
+        name: result.user.name,
+      );
+
+      return result.user.toEntity();
+    } on ApiException catch (e) {
+      throw ErrorHandler.toFailure(e);
+    }
+  }
+
+  @override
+  Future<void> requestWhatsAppOtp(WhatsAppOtpRequestParams params) async {
+    try {
+      await _remote.requestWhatsAppOtp(phone: params.phone);
+    } on ApiException catch (e) {
+      throw ErrorHandler.toFailure(e);
+    }
+  }
+
+  @override
+  Future<User> verifyWhatsAppOtp(WhatsAppVerifyParams params) async {
+    try {
+      final result = await _remote.verifyWhatsAppOtp(
+        phone: params.phone,
+        code: params.code,
       );
 
       // Persist tokens and cache user

@@ -1,15 +1,19 @@
 /// Login screen.
 ///
-/// Full login screen with email/password, Google Sign-In,
-/// biometric unlock, and 2FA support. Matches the Sanbao
-/// design system with the "Soft Corporate Minimalism" style.
+/// Social-only authentication screen with Google, Apple, and WhatsApp
+/// sign-in buttons. Follows the Sanbao "Soft Corporate Minimalism" style.
 library;
 
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:local_auth/local_auth.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sanbao_flutter/core/config/app_config.dart';
 import 'package:sanbao_flutter/core/config/env.dart';
 import 'package:sanbao_flutter/core/config/routes.dart';
@@ -19,18 +23,14 @@ import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/theme/shadows.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/features/auth/presentation/providers/auth_provider.dart';
-import 'package:sanbao_flutter/features/auth/presentation/widgets/login_form.dart';
 import 'package:sanbao_flutter/features/auth/presentation/widgets/social_login_button.dart';
-import 'package:sanbao_flutter/features/auth/presentation/widgets/two_factor_input.dart';
 
 /// The main login screen of the application.
 ///
-/// Provides:
-/// - Email/password login form
-/// - Google Sign-In button
-/// - Biometric unlock option (fingerprint/face)
-/// - 2FA verification when required
-/// - Navigation to registration
+/// Provides social-only authentication:
+/// - Google Sign-In
+/// - Apple Sign-In (iOS/macOS)
+/// - WhatsApp Sign-In (phone + OTP)
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -40,109 +40,14 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _errorMessage;
-  bool _isLoading = false;
   bool _isGoogleLoading = false;
-  bool _show2faInput = false;
-  String? _pendingEmail;
-  String? _pendingPassword;
-  String? _twoFactorError;
-  bool _biometricAvailable = false;
+  bool _isAppleLoading = false;
+  bool _isWhatsAppLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _checkBiometric();
-  }
+  bool get _isAnyLoading =>
+      _isGoogleLoading || _isAppleLoading || _isWhatsAppLoading;
 
-  Future<void> _checkBiometric() async {
-    if (!AppConfig.enableBiometricAuth) return;
-
-    try {
-      final localAuth = LocalAuthentication();
-      final canCheck = await localAuth.canCheckBiometrics;
-      final isSupported = await localAuth.isDeviceSupported();
-
-      if (mounted) {
-        setState(() {
-          _biometricAvailable = canCheck && isSupported;
-        });
-      }
-    } catch (_) {
-      // Biometric not available
-    }
-  }
-
-  Future<void> _handleLogin(LoginFormData data) async {
-    setState(() {
-      _errorMessage = null;
-      _isLoading = true;
-    });
-
-    try {
-      await ref.read(authStateProvider.notifier).login(
-            email: data.email,
-            password: data.password,
-          );
-      // Navigation is handled by the router redirect
-    } on AuthFailure catch (f) {
-      if (f.code == '2FA_REQUIRED') {
-        setState(() {
-          _show2faInput = true;
-          _pendingEmail = data.email;
-          _pendingPassword = data.password;
-          _isLoading = false;
-        });
-        return;
-      }
-      setState(() {
-        _errorMessage = f.message;
-        _isLoading = false;
-      });
-    } on Failure catch (f) {
-      setState(() {
-        _errorMessage = f.message;
-        _isLoading = false;
-      });
-    } catch (_) {
-      setState(() {
-        _errorMessage = 'Произошла ошибка. Попробуйте позже.';
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _handle2faSubmit(String code) async {
-    if (_pendingEmail == null || _pendingPassword == null) return;
-
-    setState(() {
-      _twoFactorError = null;
-      _isLoading = true;
-    });
-
-    try {
-      await ref.read(authStateProvider.notifier).login(
-            email: _pendingEmail!,
-            password: _pendingPassword!,
-            totpCode: code,
-          );
-      // Navigation is handled by the router redirect
-    } on AuthFailure catch (f) {
-      setState(() {
-        _twoFactorError = f.message;
-        _isLoading = false;
-      });
-    } on Failure catch (f) {
-      setState(() {
-        _twoFactorError = f.message;
-        _isLoading = false;
-      });
-    } catch (_) {
-      setState(() {
-        _twoFactorError = 'Неверный код. Попробуйте ещё раз.';
-        _isLoading = false;
-      });
-    }
-  }
+  // ---- Google Sign-In ----
 
   Future<void> _handleGoogleSignIn() async {
     if (!Env.isGoogleSignInEnabled) return;
@@ -160,7 +65,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       final account = await googleSignIn.signIn();
       if (account == null) {
-        // User cancelled
         setState(() => _isGoogleLoading = false);
         return;
       }
@@ -179,44 +83,384 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref.read(authStateProvider.notifier).signInWithGoogle(
             idToken: idToken,
           );
-      // Navigation is handled by the router redirect
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Ошибка входа через Google';
-        _isGoogleLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Ошибка входа через Google';
+          _isGoogleLoading = false;
+        });
+      }
     }
   }
 
-  Future<void> _handleBiometricAuth() async {
-    final localAuth = LocalAuthentication();
+  // ---- Apple Sign-In ----
+
+  String _generateNonce([int length = 32]) {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
+  }
+
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
+  Future<void> _handleAppleSignIn() async {
+    setState(() {
+      _errorMessage = null;
+      _isAppleLoading = true;
+    });
 
     try {
-      final authenticated = await localAuth.authenticate(
-        localizedReason: 'Войдите с помощью биометрии',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: true,
-        ),
+      final rawNonce = _generateNonce();
+      final hashedNonce = _sha256ofString(rawNonce);
+
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
       );
 
-      if (authenticated && mounted) {
-        // If biometric succeeds, try to restore the session
-        // using stored credentials
-        await ref.read(authStateProvider.notifier).refreshUser();
+      final identityToken = credential.identityToken;
+      if (identityToken == null) {
+        setState(() {
+          _errorMessage = 'Не удалось получить токен Apple';
+          _isAppleLoading = false;
+        });
+        return;
       }
-    } catch (_) {
-      // Biometric auth failed or cancelled
+
+      String? fullName;
+      final givenName = credential.givenName;
+      final familyName = credential.familyName;
+      if (givenName != null || familyName != null) {
+        fullName = [givenName, familyName]
+            .where((s) => s != null && s.isNotEmpty)
+            .join(' ');
+        if (fullName.isEmpty) fullName = null;
+      }
+
+      await ref.read(authStateProvider.notifier).signInWithApple(
+            identityToken: identityToken,
+            authorizationCode: credential.authorizationCode,
+            email: credential.email,
+            fullName: fullName,
+            nonce: rawNonce,
+          );
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        setState(() => _isAppleLoading = false);
+        return;
+      }
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Ошибка входа через Apple';
+          _isAppleLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Ошибка входа через Apple';
+          _isAppleLoading = false;
+        });
+      }
     }
   }
 
-  void _navigateToRegister() {
-    context.goNamed(RouteNames.register);
+  // ---- WhatsApp Sign-In (phone + OTP) ----
+
+  Future<void> _handleWhatsAppSignIn() async {
+    setState(() {
+      _errorMessage = null;
+      _isWhatsAppLoading = true;
+    });
+
+    try {
+      final result = await _showPhoneInputSheet();
+      if (result == null) {
+        setState(() => _isWhatsAppLoading = false);
+        return;
+      }
+
+      // Request OTP
+      await ref.read(authStateProvider.notifier).requestWhatsAppOtp(
+            phone: result,
+          );
+
+      if (!mounted) return;
+
+      // Show OTP input
+      final code = await _showOtpInputSheet(result);
+      if (code == null) {
+        setState(() => _isWhatsAppLoading = false);
+        return;
+      }
+
+      // Verify OTP
+      await ref.read(authStateProvider.notifier).verifyWhatsAppOtp(
+            phone: result,
+            code: code,
+          );
+    } on Failure catch (f) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = f.message;
+          _isWhatsAppLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Ошибка входа через WhatsApp';
+          _isWhatsAppLoading = false;
+        });
+      }
+    }
   }
+
+  /// Shows a bottom sheet for phone number input.
+  /// Returns the phone number or null if cancelled.
+  Future<String?> _showPhoneInputSheet() async {
+    final controller = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final colors = ctx.sanbaoColors;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                Text(
+                  'Вход через WhatsApp',
+                  style: ctx.textTheme.titleLarge?.copyWith(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Введите номер телефона, на который '
+                  'придёт код подтверждения в WhatsApp',
+                  style: ctx.textTheme.bodyMedium?.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+
+                TextFormField(
+                  controller: controller,
+                  keyboardType: TextInputType.phone,
+                  autofocus: true,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9+\-\s()]')),
+                  ],
+                  decoration: InputDecoration(
+                    hintText: '+7 999 123 45 67',
+                    prefixIcon: const Icon(Icons.phone_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: SanbaoRadius.md,
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().length < 10) {
+                      return 'Введите корректный номер телефона';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                FilledButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      Navigator.of(ctx).pop(controller.text.trim());
+                    }
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF25D366),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: SanbaoRadius.md,
+                    ),
+                  ),
+                  child: const Text(
+                    'Получить код',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Shows a bottom sheet for OTP code input.
+  /// Returns the OTP code or null if cancelled.
+  Future<String?> _showOtpInputSheet(String phone) async {
+    final controller = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final colors = ctx.sanbaoColors;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                Text(
+                  'Введите код',
+                  style: ctx.textTheme.titleLarge?.copyWith(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Код отправлен на $phone в WhatsApp',
+                  style: ctx.textTheme.bodyMedium?.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+
+                TextFormField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  autofocus: true,
+                  textAlign: TextAlign.center,
+                  style: ctx.textTheme.headlineSmall?.copyWith(
+                    letterSpacing: 8,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(6),
+                  ],
+                  decoration: InputDecoration(
+                    hintText: '------',
+                    border: OutlineInputBorder(
+                      borderRadius: SanbaoRadius.md,
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.length < 4) {
+                      return 'Введите код из WhatsApp';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                FilledButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      Navigator.of(ctx).pop(controller.text.trim());
+                    }
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF25D366),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: SanbaoRadius.md,
+                    ),
+                  ),
+                  child: const Text(
+                    'Подтвердить',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ---- Build ----
 
   @override
   Widget build(BuildContext context) {
-    // Listen for auth state changes for navigation
     ref.listen<AuthState>(authStateProvider, (_, state) {
       if (state is AuthAuthenticated) {
         context.goNamed(RouteNames.chat);
@@ -224,197 +468,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     return Scaffold(
-      body: _show2faInput
-          ? _build2faScreen(context)
-          : _buildLoginScreen(context),
-    );
-  }
-
-  Widget _buildLoginScreen(BuildContext context) {
-    final colors = context.sanbaoColors;
-
-    return SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 48),
-
-                // Logo and title
-                _buildHeader(context),
-                const SizedBox(height: 40),
-
-                // Login form card
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: colors.bgSurface,
-                    borderRadius: SanbaoRadius.lg,
-                    border: Border.all(
-                      color: colors.border,
-                      width: 0.5,
-                    ),
-                    boxShadow: SanbaoShadows.md,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Вход в аккаунт',
-                        style: context.textTheme.headlineSmall?.copyWith(
-                          color: colors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Введите данные для входа',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: colors.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Login form
-                      LoginForm(
-                        onSubmit: _handleLogin,
-                        isLoading: _isLoading,
-                        errorMessage: _errorMessage,
-                        onForgotPassword: () {
-                          // TODO: Implement forgot password
-                        },
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Divider
-                      _buildDivider(context),
-                      const SizedBox(height: 20),
-
-                      // Google Sign-In
-                      if (Env.isGoogleSignInEnabled)
-                        SocialLoginButton(
-                          provider: SocialProvider.google,
-                          onPressed: _handleGoogleSignIn,
-                          isLoading: _isGoogleLoading,
-                          isDisabled: _isLoading,
-                          label: 'Войти через Google',
-                        ),
-
-                      // Biometric
-                      if (_biometricAvailable) ...[
-                        const SizedBox(height: 12),
-                        _buildBiometricButton(context),
-                      ],
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Register link
-                _buildRegisterLink(context),
-                const SizedBox(height: 48),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _build2faScreen(BuildContext context) {
-    final colors = context.sanbaoColors;
-
-    return SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: colors.bgSurface,
-                borderRadius: SanbaoRadius.lg,
-                border: Border.all(
-                  color: colors.border,
-                  width: 0.5,
-                ),
-                boxShadow: SanbaoShadows.md,
-              ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Back button
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _show2faInput = false;
-                          _pendingEmail = null;
-                          _pendingPassword = null;
-                          _twoFactorError = null;
-                        });
-                      },
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Shield icon
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: colors.accentLight,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.shield_outlined,
-                      size: 32,
-                      color: colors.accent,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  Text(
-                    'Двухфакторная аутентификация',
-                    style: context.textTheme.titleLarge?.copyWith(
-                      color: colors.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Введите 6-значный код из приложения-аутентификатора',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: colors.textSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-
-                  // OTP Input
-                  TwoFactorInput(
-                    onCompleted: _handle2faSubmit,
-                    errorText: _twoFactorError,
-                    isLoading: _isLoading,
-                  ),
-
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 48),
+                  _buildHeader(context),
+                  const SizedBox(height: 40),
+                  _buildAuthCard(context),
+                  const SizedBox(height: 24),
+                  _buildFooter(context),
+                  const SizedBox(height: 48),
                 ],
               ),
             ),
@@ -429,7 +499,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Column(
       children: [
-        // Sanbao logo/compass icon
         Container(
           width: 72,
           height: 72,
@@ -473,90 +542,116 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildDivider(BuildContext context) {
+  Widget _buildAuthCard(BuildContext context) {
     final colors = context.sanbaoColors;
 
-    return Row(
-      children: [
-        Expanded(child: Divider(color: colors.border)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'или',
-            style: context.textTheme.bodySmall?.copyWith(
-              color: colors.textMuted,
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: colors.bgSurface,
+        borderRadius: SanbaoRadius.lg,
+        border: Border.all(color: colors.border, width: 0.5),
+        boxShadow: SanbaoShadows.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Войти в аккаунт',
+            style: context.textTheme.headlineSmall?.copyWith(
+              color: colors.textPrimary,
+              fontWeight: FontWeight.w600,
             ),
+            textAlign: TextAlign.center,
           ),
-        ),
-        Expanded(child: Divider(color: colors.border)),
-      ],
-    );
-  }
+          const SizedBox(height: 8),
+          Text(
+            'Выберите способ входа',
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: colors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
 
-  Widget _buildBiometricButton(BuildContext context) {
-    final colors = context.sanbaoColors;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: _isLoading ? null : _handleBiometricAuth,
-        borderRadius: SanbaoRadius.md,
-        child: Ink(
-          decoration: BoxDecoration(
-            color: colors.bgSurfaceAlt,
-            borderRadius: SanbaoRadius.md,
-            border: Border.all(color: colors.border),
-          ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 14,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.fingerprint,
-                size: 22,
-                color: colors.accent,
+          // Error message
+          if (_errorMessage != null) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colors.errorLight,
+                borderRadius: SanbaoRadius.sm,
               ),
-              const SizedBox(width: 12),
-              Text(
-                'Войти с биометрией',
-                style: context.textTheme.labelLarge?.copyWith(
-                  color: colors.textPrimary,
-                  fontWeight: FontWeight.w500,
+              child: Text(
+                _errorMessage!,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: colors.error,
                 ),
+                textAlign: TextAlign.center,
               ),
-            ],
-          ),
-        ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Social login buttons
+          _buildSocialButtons(),
+        ],
       ),
     );
   }
 
-  Widget _buildRegisterLink(BuildContext context) {
-    final colors = context.sanbaoColors;
+  Widget _buildSocialButtons() {
+    final showApple = SocialLoginButton.isAppleSignInAvailable;
+    final showGoogle = Env.isGoogleSignInEnabled;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        Text(
-          'Нет аккаунта? ',
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: colors.textSecondary,
+        // Google Sign-In
+        if (showGoogle) ...[
+          SocialLoginButton(
+            provider: SocialProvider.google,
+            onPressed: _handleGoogleSignIn,
+            isLoading: _isGoogleLoading,
+            isDisabled: _isAnyLoading && !_isGoogleLoading,
+            label: 'Войти через Google',
           ),
-        ),
-        GestureDetector(
-          onTap: _navigateToRegister,
-          child: Text(
-            'Зарегистрируйтесь',
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: colors.accent,
-              fontWeight: FontWeight.w600,
-            ),
+          const SizedBox(height: 12),
+        ],
+
+        // Apple Sign-In (iOS/macOS per Apple HIG)
+        if (showApple) ...[
+          SocialLoginButton(
+            provider: SocialProvider.apple,
+            onPressed: _handleAppleSignIn,
+            isLoading: _isAppleLoading,
+            isDisabled: _isAnyLoading && !_isAppleLoading,
+            label: 'Войти через Apple',
           ),
+          const SizedBox(height: 12),
+        ],
+
+        // WhatsApp Sign-In
+        SocialLoginButton(
+          provider: SocialProvider.whatsapp,
+          onPressed: _handleWhatsAppSignIn,
+          isLoading: _isWhatsAppLoading,
+          isDisabled: _isAnyLoading && !_isWhatsAppLoading,
+          label: 'Войти через WhatsApp',
         ),
       ],
+    );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    final colors = context.sanbaoColors;
+
+    return Text(
+      'Продолжая, вы соглашаетесь с условиями '
+      'использования и политикой конфиденциальности',
+      style: context.textTheme.bodySmall?.copyWith(
+        color: colors.textMuted,
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }

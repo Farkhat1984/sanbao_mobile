@@ -155,7 +155,7 @@ class NotificationsListNotifier
       return true;
     } on Object {
       // Revert: insert back at original position
-      final reverted = [...(state.valueOrNull ?? [])];
+      final reverted = <AppNotification>[...(state.valueOrNull ?? [])];
       final insertAt = removedIndex.clamp(0, reverted.length);
       reverted.insert(insertAt, removedItem);
       state = AsyncData(reverted);

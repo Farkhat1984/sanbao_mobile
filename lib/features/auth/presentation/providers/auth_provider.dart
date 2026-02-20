@@ -206,6 +206,61 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Signs in with Apple credentials.
+  Future<void> signInWithApple({
+    required String identityToken,
+    required String authorizationCode,
+    String? email,
+    String? fullName,
+    String? nonce,
+  }) async {
+    state = const AuthLoading();
+
+    try {
+      final user = await _repository.signInWithApple(
+        AppleSignInParams(
+          identityToken: identityToken,
+          authorizationCode: authorizationCode,
+          email: email,
+          fullName: fullName,
+          nonce: nonce,
+        ),
+      );
+      state = AuthAuthenticated(user: user);
+    } on Failure catch (f) {
+      state = AuthError(failure: f);
+    }
+  }
+
+  /// Requests a WhatsApp OTP for the given phone number.
+  Future<void> requestWhatsAppOtp({required String phone}) async {
+    try {
+      await _repository.requestWhatsAppOtp(
+        WhatsAppOtpRequestParams(phone: phone),
+      );
+    } on Failure catch (f) {
+      state = AuthError(failure: f);
+      rethrow;
+    }
+  }
+
+  /// Verifies a WhatsApp OTP and authenticates the user.
+  Future<void> verifyWhatsAppOtp({
+    required String phone,
+    required String code,
+  }) async {
+    state = const AuthLoading();
+
+    try {
+      final user = await _repository.verifyWhatsAppOtp(
+        WhatsAppVerifyParams(phone: phone, code: code),
+      );
+      state = AuthAuthenticated(user: user);
+    } on Failure catch (f) {
+      state = AuthError(failure: f);
+    }
+  }
+
   /// Logs out the current user.
   Future<void> logout() async {
     try {

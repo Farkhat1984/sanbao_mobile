@@ -53,6 +53,54 @@ class GoogleSignInParams {
   final String idToken;
 }
 
+/// Parameters for requesting a WhatsApp OTP.
+class WhatsAppOtpRequestParams {
+  const WhatsAppOtpRequestParams({required this.phone});
+
+  /// Phone number in international format (e.g. +79991234567).
+  final String phone;
+}
+
+/// Parameters for verifying a WhatsApp OTP.
+class WhatsAppVerifyParams {
+  const WhatsAppVerifyParams({
+    required this.phone,
+    required this.code,
+  });
+
+  /// Phone number used when requesting the OTP.
+  final String phone;
+
+  /// The OTP code received via WhatsApp.
+  final String code;
+}
+
+/// Parameters for Apple Sign-In.
+class AppleSignInParams {
+  const AppleSignInParams({
+    required this.identityToken,
+    required this.authorizationCode,
+    this.email,
+    this.fullName,
+    this.nonce,
+  });
+
+  /// The Apple identity token (JWT).
+  final String identityToken;
+
+  /// The authorization code from Apple.
+  final String authorizationCode;
+
+  /// User email (only provided on first sign-in).
+  final String? email;
+
+  /// User full name (only provided on first sign-in).
+  final String? fullName;
+
+  /// The raw nonce used for the request (for server-side verification).
+  final String? nonce;
+}
+
 /// Result of a 2FA setup request.
 class TwoFactorSetupResult {
   const TwoFactorSetupResult({
@@ -92,6 +140,21 @@ abstract class AuthRepository {
   ///
   /// Creates the account if it does not exist, or links it.
   Future<User> signInWithGoogle(GoogleSignInParams params);
+
+  /// Authenticates with Apple credentials.
+  ///
+  /// Creates the account if it does not exist, or links it.
+  Future<User> signInWithApple(AppleSignInParams params);
+
+  /// Requests a WhatsApp OTP for the given phone number.
+  ///
+  /// The server sends the code via WhatsApp Business API.
+  Future<void> requestWhatsAppOtp(WhatsAppOtpRequestParams params);
+
+  /// Verifies the WhatsApp OTP and authenticates the user.
+  ///
+  /// Creates the account if it does not exist, or links it.
+  Future<User> verifyWhatsAppOtp(WhatsAppVerifyParams params);
 
   /// Logs out the current user.
   ///

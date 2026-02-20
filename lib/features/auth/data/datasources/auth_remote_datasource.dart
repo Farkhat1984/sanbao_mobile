@@ -17,6 +17,9 @@ import 'package:sanbao_flutter/features/auth/data/models/user_model.dart';
 /// - POST /api/auth/login
 /// - POST /api/auth/register
 /// - POST /api/auth/google
+/// - POST /api/auth/apple
+/// - POST /api/auth/whatsapp/request
+/// - POST /api/auth/whatsapp/verify
 /// - POST /api/auth/logout
 /// - POST /api/auth/refresh
 /// - GET  /api/auth/me
@@ -90,6 +93,78 @@ class AuthRemoteDataSource {
     final response = await _dioClient.post<Map<String, Object?>>(
       '$_basePath/google',
       data: {'idToken': idToken},
+    );
+
+    _assertSuccessResponse(response);
+
+    final user = UserModel.fromJson(
+      response['user']! as Map<String, Object?>,
+    );
+    final tokens = TokenModel.fromJson(
+      response['tokens']! as Map<String, Object?>,
+    );
+
+    return (user: user, tokens: tokens);
+  }
+
+  /// Authenticates or links an Apple account via identity token.
+  ///
+  /// Returns the user and tokens if the account exists or was created.
+  Future<({UserModel user, TokenModel tokens})> signInWithApple({
+    required String identityToken,
+    required String authorizationCode,
+    String? email,
+    String? fullName,
+    String? nonce,
+  }) async {
+    final response = await _dioClient.post<Map<String, Object?>>(
+      '$_basePath/apple',
+      data: {
+        'identityToken': identityToken,
+        'authorizationCode': authorizationCode,
+        if (email != null) 'email': email,
+        if (fullName != null) 'fullName': fullName,
+        if (nonce != null) 'nonce': nonce,
+      },
+    );
+
+    _assertSuccessResponse(response);
+
+    final user = UserModel.fromJson(
+      response['user']! as Map<String, Object?>,
+    );
+    final tokens = TokenModel.fromJson(
+      response['tokens']! as Map<String, Object?>,
+    );
+
+    return (user: user, tokens: tokens);
+  }
+
+  /// Requests a WhatsApp OTP for the given phone number.
+  ///
+  /// The server sends a verification code via WhatsApp Business API.
+  Future<void> requestWhatsAppOtp({required String phone}) async {
+    final response = await _dioClient.post<Map<String, Object?>>(
+      '$_basePath/whatsapp/request',
+      data: {'phone': phone.trim()},
+    );
+
+    _assertSuccessResponse(response);
+  }
+
+  /// Verifies a WhatsApp OTP and authenticates the user.
+  ///
+  /// Returns the user and tokens if the code is valid.
+  Future<({UserModel user, TokenModel tokens})> verifyWhatsAppOtp({
+    required String phone,
+    required String code,
+  }) async {
+    final response = await _dioClient.post<Map<String, Object?>>(
+      '$_basePath/whatsapp/verify',
+      data: {
+        'phone': phone.trim(),
+        'code': code.replaceAll(RegExp(r'\s'), ''),
+      },
     );
 
     _assertSuccessResponse(response);
