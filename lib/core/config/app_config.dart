@@ -31,7 +31,7 @@ abstract final class AppConfig {
   static String get authEndpoint => '$apiPath/auth';
   static String get healthEndpoint => '$apiPath/health';
   static String get filesEndpoint => '$apiPath/files';
-  static String get mcpServersEndpoint => '$apiPath/mcp-servers';
+  static String get mcpServersEndpoint => '$apiPath/mcp';
   static String get toolsEndpoint => '$apiPath/tools';
   static String get pluginsEndpoint => '$apiPath/plugins';
   static String get notificationsEndpoint => '$apiPath/notifications';

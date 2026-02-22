@@ -335,6 +335,7 @@ class AuthRepositoryImpl implements AuthRepository {
           role: cached.role,
           locale: cached.locale,
           emailVerified: cached.emailVerified,
+          twoFactorEnabled: false,
           subscriptionTier: cached.subscriptionTier,
           isBanned: cached.isBanned,
           createdAt: cached.createdAt,

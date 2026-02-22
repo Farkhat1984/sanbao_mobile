@@ -18,11 +18,11 @@ import 'package:sanbao_flutter/features/skills/presentation/screens/skill_form_s
 
 /// Jurisdiction options for skill generation.
 const _jurisdictions = <String, String>{
-  'RU': 'Россия',
+  'RF': 'Россия',
   'KZ': 'Казахстан',
   'BY': 'Беларусь',
   'EU': 'Европейский Союз',
-  'EU/RU': 'ЕС / Россия',
+  'EU/RF': 'ЕС / Россия',
   'International': 'Международное',
 };
 

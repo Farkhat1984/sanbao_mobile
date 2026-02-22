@@ -497,32 +497,41 @@ class _FeatureNavSection extends StatelessWidget {
         ),
       ),
       child: const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _NavIcon(
-            icon: Icons.smart_toy_rounded,
-            label: 'Агенты',
-            path: RoutePaths.agents,
+          Expanded(
+            child: _NavIcon(
+              icon: Icons.smart_toy_rounded,
+              label: 'Агенты',
+              path: RoutePaths.agents,
+            ),
           ),
-          _NavIcon(
-            icon: Icons.auto_fix_high_rounded,
-            label: 'Навыки',
-            path: RoutePaths.skills,
+          Expanded(
+            child: _NavIcon(
+              icon: Icons.auto_fix_high_rounded,
+              label: 'Навыки',
+              path: RoutePaths.skills,
+            ),
           ),
-          _NavIcon(
-            icon: Icons.build_rounded,
-            label: 'Тулы',
-            path: RoutePaths.tools,
+          Expanded(
+            child: _NavIcon(
+              icon: Icons.build_rounded,
+              label: 'Тулы',
+              path: RoutePaths.tools,
+            ),
           ),
-          _NavIcon(
-            icon: Icons.extension_rounded,
-            label: 'Плагины',
-            path: RoutePaths.plugins,
+          Expanded(
+            child: _NavIcon(
+              icon: Icons.extension_rounded,
+              label: 'Плагины',
+              path: RoutePaths.plugins,
+            ),
           ),
-          _NavIcon(
-            icon: Icons.dns_rounded,
-            label: 'MCP',
-            path: RoutePaths.mcpServers,
+          Expanded(
+            child: _NavIcon(
+              icon: Icons.dns_rounded,
+              label: 'MCP',
+              path: RoutePaths.mcpServers,
+            ),
           ),
         ],
       ),
@@ -570,6 +579,8 @@ class _NavIcon extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   label,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: TextStyle(
                     fontSize: 9,
                     color: colors.textMuted,

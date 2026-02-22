@@ -1,6 +1,6 @@
 /// Remote data source for notification operations.
 ///
-/// Handles GET/PUT/DELETE calls to the notifications API endpoint.
+/// Handles GET/PUT calls to the notifications API endpoint.
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,41 +38,38 @@ class NotificationRemoteDataSource {
 
   /// Returns the count of unread notifications.
   ///
-  /// Calls `GET /api/notifications/unread-count`. If the endpoint
-  /// does not exist, falls back to fetching all and counting locally.
+  /// Computes locally from the full list since the backend
+  /// does not provide a dedicated unread-count endpoint.
   Future<int> getUnreadCount() async {
-    try {
-      final response = await _dioClient.get<Map<String, Object?>>(
-        '${AppConfig.notificationsEndpoint}/unread-count',
-      );
-      return (response['count'] as num?)?.toInt() ?? 0;
-    } on Object {
-      // Fallback: fetch all notifications and count unread
-      final all = await getAll();
-      return all.where((n) => !n.isRead).length;
-    }
+    final all = await getAll();
+    return all.where((n) => !n.isRead).length;
   }
 
   /// Marks a single notification as read.
+  ///
+  /// Backend expects `PUT /api/notifications` with `{ ids: [id] }`.
   Future<void> markAsRead(String id) async {
     await _dioClient.put<Map<String, Object?>>(
-      '${AppConfig.notificationsEndpoint}/$id',
-      data: {'isRead': true},
+      AppConfig.notificationsEndpoint,
+      data: {'ids': [id]},
     );
   }
 
   /// Marks all notifications as read.
+  ///
+  /// Backend expects `PUT /api/notifications` with no ids (marks all).
   Future<void> markAllAsRead() async {
     await _dioClient.put<Map<String, Object?>>(
-      '${AppConfig.notificationsEndpoint}/read-all',
+      AppConfig.notificationsEndpoint,
     );
   }
 
-  /// Deletes a notification by [id].
+  /// Dismisses a notification by marking it as read.
+  ///
+  /// Backend does not support DELETE for notifications,
+  /// so we mark it as read instead to hide it from unread list.
   Future<void> delete(String id) async {
-    await _dioClient.delete<Map<String, Object?>>(
-      '${AppConfig.notificationsEndpoint}/$id',
-    );
+    await markAsRead(id);
   }
 }
 

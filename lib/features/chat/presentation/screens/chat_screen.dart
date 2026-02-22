@@ -11,6 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/core/theme/animations.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_compass.dart';
+import 'package:sanbao_flutter/features/artifacts/domain/entities/artifact.dart'
+    as full;
+import 'package:sanbao_flutter/features/artifacts/presentation/screens/artifact_view_screen.dart';
 import 'package:sanbao_flutter/features/chat/data/models/chat_event_model.dart';
 import 'package:sanbao_flutter/features/chat/domain/entities/chat_event.dart';
 import 'package:sanbao_flutter/features/chat/domain/entities/message.dart';
@@ -296,8 +299,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           showTimestamp: _shouldShowTimestamp(messages, index),
           animate: index >= messages.length - 2,
           onArtifactOpen: (artifactId) {
-            // TODO(dev): Open artifact viewer
-            context.showSnackBar('Просмотр артефакта');
+            final artifact = message.artifacts
+                .where((a) => a.id == artifactId)
+                .firstOrNull;
+            if (artifact == null) return;
+
+            openArtifactViewer(
+              context: context,
+              ref: ref,
+              artifact: full.FullArtifact(
+                id: artifact.id,
+                type: full.ArtifactType.fromString(artifact.type.name),
+                title: artifact.title,
+                content: artifact.content,
+                language: artifact.language,
+                conversationId:
+                    ref.read(currentConversationIdProvider),
+                messageId: message.id,
+              ),
+            );
           },
           onLegalReferenceTap: (codeName, article) {
             showLegalArticleSheet(

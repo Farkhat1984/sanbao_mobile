@@ -27,9 +27,14 @@ class ConversationModel {
         agentName: agentJson?['name'] as String?,
         agentIcon: agentJson?['icon'] as String?,
         agentColor: agentJson?['iconColor'] as String?,
-        isPinned: json['isPinned'] as bool? ?? false,
-        isArchived: json['isArchived'] as bool? ?? false,
+        isPinned: json['pinned'] as bool? ??
+            json['isPinned'] as bool? ??
+            false,
+        isArchived: json['archived'] as bool? ??
+            json['isArchived'] as bool? ??
+            false,
         lastMessagePreview: json['lastMessagePreview'] as String? ??
+            json['lastMessage'] as String? ??
             _extractPreview(json),
         messageCount: (json['messageCount'] as num?)?.toInt() ??
             (json['_count'] as Map<String, Object?>?)?['messages'] as int? ??

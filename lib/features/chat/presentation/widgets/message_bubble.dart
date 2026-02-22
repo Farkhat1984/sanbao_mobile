@@ -160,7 +160,7 @@ class _MessageBubbleState extends State<MessageBubble>
               borderRadius: SanbaoRadius.userMessage,
               boxShadow: SanbaoShadows.sm,
             ),
-            child: SelectableText(
+            child: Text(
               widget.message.content,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: colors.textInverse,

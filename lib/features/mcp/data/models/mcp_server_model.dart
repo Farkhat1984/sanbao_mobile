@@ -54,7 +54,8 @@ class McpServerModel {
       .map((json) => McpServerModel.fromJson(json).server)
       .toList();
 
-  static McpServerStatus _parseStatus(String status) => switch (status) {
+  static McpServerStatus _parseStatus(String status) =>
+      switch (status.toLowerCase()) {
         'connected' => McpServerStatus.connected,
         'error' => McpServerStatus.error,
         _ => McpServerStatus.disconnected,

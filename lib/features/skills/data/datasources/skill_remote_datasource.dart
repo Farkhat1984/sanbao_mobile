@@ -41,7 +41,7 @@ class SkillRemoteDataSource {
   Future<List<Skill>> getPublic() async {
     final response = await _dioClient.get<Object>(
       AppConfig.skillsEndpoint,
-      queryParameters: {'public': true},
+      queryParameters: {'marketplace': true},
     );
 
     // API returns a plain list

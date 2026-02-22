@@ -26,7 +26,7 @@ class MarkdownRenderer extends StatelessWidget {
   const MarkdownRenderer({
     required this.content,
     super.key,
-    this.selectable = true,
+    this.selectable = false,
     this.shrinkWrap = true,
     this.maxLines,
     this.onLegalReferenceTap,

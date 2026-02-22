@@ -92,7 +92,7 @@ class McpRemoteDataSource {
   /// Tests the connection to an MCP server.
   Future<McpServer> testConnection(String id) async {
     final response = await _dioClient.post<Map<String, Object?>>(
-      '${AppConfig.mcpServersEndpoint}/$id/test',
+      '${AppConfig.mcpServersEndpoint}/$id/connect',
     );
 
     return McpServerModel.fromJson(response).server;
