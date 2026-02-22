@@ -19,12 +19,19 @@ class NotificationRemoteDataSource {
   /// Fetches all notifications for the current user.
   Future<List<AppNotification>> getAll() async {
     final response = await _dioClient
-        .get<Map<String, Object?>>(AppConfig.notificationsEndpoint);
+        .get<Object>(AppConfig.notificationsEndpoint);
 
-    final notificationsJson =
-        response['notifications'] as List<Object?>? ??
-            response['data'] as List<Object?>? ??
-            [];
+    // API may return a plain list or a wrapped object
+    final List<Object?> notificationsJson;
+    if (response is List) {
+      notificationsJson = response.cast<Object?>();
+    } else if (response is Map<String, Object?>) {
+      notificationsJson = response['notifications'] as List<Object?>? ??
+          response['data'] as List<Object?>? ??
+          [];
+    } else {
+      notificationsJson = [];
+    }
 
     return NotificationModel.fromJsonList(notificationsJson);
   }

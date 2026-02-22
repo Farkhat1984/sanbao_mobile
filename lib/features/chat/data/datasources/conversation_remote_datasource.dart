@@ -23,7 +23,7 @@ class ConversationRemoteDataSource {
     int limit = 50,
     int offset = 0,
   }) async {
-    final response = await _dioClient.get<Map<String, Object?>>(
+    final response = await _dioClient.get<Object>(
       AppConfig.conversationsEndpoint,
       queryParameters: {
         'limit': limit,
@@ -31,9 +31,17 @@ class ConversationRemoteDataSource {
       },
     );
 
-    final conversationsJson = response['conversations'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
+    // API may return a plain list or a wrapped object
+    final List<Object?> conversationsJson;
+    if (response is List) {
+      conversationsJson = response.cast<Object?>();
+    } else if (response is Map<String, Object?>) {
+      conversationsJson = response['conversations'] as List<Object?>? ??
+          response['data'] as List<Object?>? ??
+          [];
+    } else {
+      conversationsJson = [];
+    }
 
     return ConversationModel.fromJsonList(conversationsJson);
   }
@@ -49,13 +57,21 @@ class ConversationRemoteDataSource {
 
   /// Fetches messages for a conversation.
   Future<List<Message>> getMessages(String conversationId) async {
-    final response = await _dioClient.get<Map<String, Object?>>(
+    final response = await _dioClient.get<Object>(
       '${AppConfig.conversationsEndpoint}/$conversationId/messages',
     );
 
-    final messagesJson = response['messages'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
+    // API may return a plain list or a wrapped object
+    final List<Object?> messagesJson;
+    if (response is List) {
+      messagesJson = response.cast<Object?>();
+    } else if (response is Map<String, Object?>) {
+      messagesJson = response['messages'] as List<Object?>? ??
+          response['data'] as List<Object?>? ??
+          [];
+    } else {
+      messagesJson = [];
+    }
 
     return messagesJson
         .whereType<Map<String, Object?>>()
