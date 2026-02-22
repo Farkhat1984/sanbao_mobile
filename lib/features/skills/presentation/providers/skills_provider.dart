@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sanbao_flutter/features/skills/data/datasources/skill_remote_datasource.dart';
 import 'package:sanbao_flutter/features/skills/data/repositories/skill_repository_impl.dart';
 import 'package:sanbao_flutter/features/skills/domain/entities/skill.dart';
 import 'package:sanbao_flutter/features/skills/domain/repositories/skill_repository.dart';
@@ -301,3 +302,101 @@ class SkillFormNotifier extends StateNotifier<SkillFormData> {
 final skillFormSubmittingProvider = StateProvider.autoDispose<bool>(
   (ref) => false,
 );
+
+// ---- Skill AI Generation ----
+
+/// Sealed state for the skill AI generation process.
+sealed class SkillGenState {
+  const SkillGenState();
+}
+
+/// Initial state before any generation attempt.
+final class SkillGenInitial extends SkillGenState {
+  const SkillGenInitial();
+}
+
+/// Skill generation is in progress.
+final class SkillGenLoading extends SkillGenState {
+  const SkillGenLoading();
+}
+
+/// Skill generation completed successfully.
+final class SkillGenSuccess extends SkillGenState {
+  const SkillGenSuccess({required this.data});
+
+  /// The generated skill configuration map.
+  final Map<String, Object?> data;
+}
+
+/// Skill generation failed.
+final class SkillGenError extends SkillGenState {
+  const SkillGenError({required this.message});
+
+  /// User-facing error message.
+  final String message;
+}
+
+/// The main skill generation state provider.
+final skillGenProvider =
+    StateNotifierProvider.autoDispose<SkillGenNotifier, SkillGenState>(
+  SkillGenNotifier.new,
+);
+
+/// Notifier that handles skill AI generation requests.
+class SkillGenNotifier extends StateNotifier<SkillGenState> {
+  SkillGenNotifier(this._ref) : super(const SkillGenInitial());
+
+  final Ref _ref;
+
+  /// Generates skill configuration from a [description].
+  Future<void> generate({
+    required String description,
+    String? jurisdiction,
+  }) async {
+    if (description.trim().isEmpty) return;
+
+    state = const SkillGenLoading();
+
+    try {
+      final datasource = _ref.read(skillRemoteDataSourceProvider);
+      final data = await datasource.generateSkill(
+        description: description.trim(),
+        jurisdiction: jurisdiction,
+      );
+
+      state = SkillGenSuccess(data: data);
+    } on Exception catch (e) {
+      state = SkillGenError(message: _extractErrorMessage(e));
+    }
+  }
+
+  /// Resets the state to initial.
+  void reset() {
+    state = const SkillGenInitial();
+  }
+
+  String _extractErrorMessage(Exception e) {
+    final message = e.toString();
+
+    if (message.contains('429') || message.contains('rate')) {
+      return 'Слишком много запросов. Подождите минуту.';
+    }
+    if (message.contains('401') || message.contains('unauthorized')) {
+      return 'Требуется авторизация';
+    }
+    if (message.contains('timeout') || message.contains('Timeout')) {
+      return 'Превышено время ожидания. Попробуйте снова.';
+    }
+    if (message.contains('network') || message.contains('Network')) {
+      return 'Нет подключения к интернету';
+    }
+
+    final errorMatch =
+        RegExp(r'message:\s*(.+?)(?:,|\))').firstMatch(message);
+    if (errorMatch != null) {
+      return errorMatch.group(1) ?? 'Не удалось сгенерировать навык';
+    }
+
+    return 'Не удалось сгенерировать навык';
+  }
+}

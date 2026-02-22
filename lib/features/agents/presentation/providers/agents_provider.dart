@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sanbao_flutter/features/agents/data/datasources/agent_remote_datasource.dart';
 import 'package:sanbao_flutter/features/agents/data/repositories/agent_repository_impl.dart';
 import 'package:sanbao_flutter/features/agents/domain/entities/agent.dart';
 import 'package:sanbao_flutter/features/agents/domain/repositories/agent_repository.dart';
@@ -306,3 +307,97 @@ class AgentFormNotifier extends StateNotifier<AgentFormData> {
 final agentFormSubmittingProvider = StateProvider.autoDispose<bool>(
   (ref) => false,
 );
+
+// ---- Agent AI Generation ----
+
+/// Sealed state for the agent AI generation process.
+sealed class AgentGenState {
+  const AgentGenState();
+}
+
+/// Initial state before any generation attempt.
+final class AgentGenInitial extends AgentGenState {
+  const AgentGenInitial();
+}
+
+/// Agent generation is in progress.
+final class AgentGenLoading extends AgentGenState {
+  const AgentGenLoading();
+}
+
+/// Agent generation completed successfully.
+final class AgentGenSuccess extends AgentGenState {
+  const AgentGenSuccess({required this.data});
+
+  /// The generated agent configuration map.
+  final Map<String, Object?> data;
+}
+
+/// Agent generation failed.
+final class AgentGenError extends AgentGenState {
+  const AgentGenError({required this.message});
+
+  /// User-facing error message.
+  final String message;
+}
+
+/// The main agent generation state provider.
+final agentGenProvider =
+    StateNotifierProvider.autoDispose<AgentGenNotifier, AgentGenState>(
+  AgentGenNotifier.new,
+);
+
+/// Notifier that handles agent AI generation requests.
+class AgentGenNotifier extends StateNotifier<AgentGenState> {
+  AgentGenNotifier(this._ref) : super(const AgentGenInitial());
+
+  final Ref _ref;
+
+  /// Generates agent configuration from a [description].
+  Future<void> generate({required String description}) async {
+    if (description.trim().isEmpty) return;
+
+    state = const AgentGenLoading();
+
+    try {
+      final datasource = _ref.read(agentRemoteDataSourceProvider);
+      final data = await datasource.generateAgent(
+        description: description.trim(),
+      );
+
+      state = AgentGenSuccess(data: data);
+    } on Exception catch (e) {
+      state = AgentGenError(message: _extractErrorMessage(e));
+    }
+  }
+
+  /// Resets the state to initial.
+  void reset() {
+    state = const AgentGenInitial();
+  }
+
+  String _extractErrorMessage(Exception e) {
+    final message = e.toString();
+
+    if (message.contains('429') || message.contains('rate')) {
+      return 'Слишком много запросов. Подождите минуту.';
+    }
+    if (message.contains('401') || message.contains('unauthorized')) {
+      return 'Требуется авторизация';
+    }
+    if (message.contains('timeout') || message.contains('Timeout')) {
+      return 'Превышено время ожидания. Попробуйте снова.';
+    }
+    if (message.contains('network') || message.contains('Network')) {
+      return 'Нет подключения к интернету';
+    }
+
+    final errorMatch =
+        RegExp(r'message:\s*(.+?)(?:,|\))').firstMatch(message);
+    if (errorMatch != null) {
+      return errorMatch.group(1) ?? 'Не удалось сгенерировать агента';
+    }
+
+    return 'Не удалось сгенерировать агента';
+  }
+}

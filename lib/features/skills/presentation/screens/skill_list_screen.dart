@@ -17,6 +17,9 @@ import 'package:sanbao_flutter/features/skills/presentation/providers/skills_pro
 import 'package:sanbao_flutter/features/skills/presentation/screens/skill_detail_screen.dart';
 import 'package:sanbao_flutter/features/skills/presentation/screens/skill_form_screen.dart';
 import 'package:sanbao_flutter/features/skills/presentation/widgets/skill_card.dart';
+import 'package:sanbao_flutter/features/skills/presentation/widgets/skill_generate_sheet.dart';
+
+// ignore_for_file: use_build_context_synchronously
 
 /// Screen displaying skills in two tabs: personal and marketplace.
 class SkillListScreen extends ConsumerStatefulWidget {
@@ -64,6 +67,10 @@ class _SkillListScreenState extends ConsumerState<SkillListScreen>
     );
   }
 
+  void _showGenerateSheet() {
+    showSkillGenerateSheet(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.sanbaoColors;
@@ -83,11 +90,25 @@ class _SkillListScreenState extends ConsumerState<SkillListScreen>
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToCreate,
-        backgroundColor: colors.accent,
-        foregroundColor: colors.textInverse,
-        child: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'skill_generate',
+            onPressed: _showGenerateSheet,
+            backgroundColor: colors.bgSurface,
+            foregroundColor: colors.accent,
+            child: const Icon(Icons.auto_awesome_rounded),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton(
+            heroTag: 'skill_create',
+            onPressed: _navigateToCreate,
+            backgroundColor: colors.accent,
+            foregroundColor: colors.textInverse,
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -215,6 +236,17 @@ class _MarketplaceTab extends ConsumerWidget {
 
   final ValueChanged<Skill> onSkillTap;
 
+  Future<void> _cloneSkill(BuildContext context, WidgetRef ref, Skill skill) async {
+    try {
+      await ref.read(skillsListProvider.notifier).cloneSkill(skill.id);
+      context.showSuccessSnackBar('Навык "${skill.name}" клонирован');
+    } on Object catch (e) {
+      context.showErrorSnackBar(
+        'Ошибка клонирования: ${e.toString().replaceFirst('Exception: ', '')}',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final skillsAsync = ref.watch(filteredPublicSkillsProvider);
@@ -249,6 +281,7 @@ class _MarketplaceTab extends ConsumerWidget {
               skill: skills[index],
               onTap: () => onSkillTap(skills[index]),
               showCloneCount: true,
+              onClone: () => _cloneSkill(context, ref, skills[index]),
             ),
           ),
         );

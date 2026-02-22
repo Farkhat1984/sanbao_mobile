@@ -115,6 +115,19 @@ class AgentRemoteDataSource {
       '${AppConfig.agentsEndpoint}/$id',
     );
   }
+
+  /// Generates agent configuration from a text description using AI.
+  ///
+  /// Returns a map with: `name`, `description`, `instructions`,
+  /// `icon`, `iconColor`.
+  Future<Map<String, Object?>> generateAgent({
+    required String description,
+  }) async {
+    return _dioClient.post<Map<String, Object?>>(
+      '${AppConfig.agentsEndpoint}/generate',
+      data: {'description': description},
+    );
+  }
 }
 
 /// Riverpod provider for [AgentRemoteDataSource].

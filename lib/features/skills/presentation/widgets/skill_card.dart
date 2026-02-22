@@ -24,6 +24,7 @@ class SkillCard extends StatefulWidget {
     required this.onTap,
     super.key,
     this.showCloneCount = false,
+    this.onClone,
   });
 
   /// The skill to display.
@@ -34,6 +35,9 @@ class SkillCard extends StatefulWidget {
 
   /// Whether to show the clone count (for marketplace view).
   final bool showCloneCount;
+
+  /// Callback when the clone button is tapped (marketplace only).
+  final VoidCallback? onClone;
 
   @override
   State<SkillCard> createState() => _SkillCardState();
@@ -160,7 +164,23 @@ class _SkillCardState extends State<SkillCard>
               size: SanbaoBadgeSize.small,
             ),
           const Spacer(),
-          if (widget.showCloneCount && skill.cloneCount > 0) ...[
+          if (widget.onClone != null)
+            GestureDetector(
+              onTap: () {
+                // Stop event from propagating to parent onTap
+                widget.onClone!();
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Icon(
+                  Icons.copy_outlined,
+                  size: 16,
+                  color: colors.accent,
+                ),
+              ),
+            )
+          else if (widget.showCloneCount && skill.cloneCount > 0) ...[
             Icon(
               Icons.copy_outlined,
               size: 12,

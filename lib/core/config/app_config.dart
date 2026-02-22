@@ -35,6 +35,10 @@ abstract final class AppConfig {
   static String get toolsEndpoint => '$apiPath/tools';
   static String get pluginsEndpoint => '$apiPath/plugins';
   static String get notificationsEndpoint => '$apiPath/notifications';
+  static String get userFilesEndpoint => '$apiPath/user-files';
+  static String get imageGenerateEndpoint => '$apiPath/image-generate';
+  static String get imageEditEndpoint => '$apiPath/image-edit';
+  static String get fixCodeEndpoint => '$apiPath/fix-code';
 
   // ---- Timeouts ----
 
@@ -85,6 +89,7 @@ abstract final class AppConfig {
   static const bool enableFileAttachments = true;
   static const bool enableOfflineMode = true;
   static const bool enablePushNotifications = true;
+  static const bool enableImageGeneration = true;
 
   // ---- Allowed File Types ----
 

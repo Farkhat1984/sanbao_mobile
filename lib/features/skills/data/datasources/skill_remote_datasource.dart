@@ -128,6 +128,23 @@ class SkillRemoteDataSource {
 
     return SkillModel.fromJson(response).skill;
   }
+
+  /// Generates skill configuration from a text description using AI.
+  ///
+  /// Returns a map with: `name`, `description`, `systemPrompt`,
+  /// `citationRules`, `jurisdiction`, `icon`, `iconColor`.
+  Future<Map<String, Object?>> generateSkill({
+    required String description,
+    String? jurisdiction,
+  }) async {
+    return _dioClient.post<Map<String, Object?>>(
+      '${AppConfig.skillsEndpoint}/generate',
+      data: {
+        'description': description,
+        if (jurisdiction != null) 'jurisdiction': jurisdiction,
+      },
+    );
+  }
 }
 
 /// Riverpod provider for [SkillRemoteDataSource].

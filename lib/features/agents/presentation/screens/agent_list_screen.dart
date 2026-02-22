@@ -17,6 +17,7 @@ import 'package:sanbao_flutter/features/agents/domain/entities/agent.dart';
 import 'package:sanbao_flutter/features/agents/presentation/providers/agents_provider.dart';
 import 'package:sanbao_flutter/features/agents/presentation/screens/agent_form_screen.dart';
 import 'package:sanbao_flutter/features/agents/presentation/widgets/agent_card.dart';
+import 'package:sanbao_flutter/features/agents/presentation/widgets/agent_generate_sheet.dart';
 
 /// Screen displaying all available agents organized by type.
 ///
@@ -58,6 +59,10 @@ class _AgentListScreenState extends ConsumerState<AgentListScreen> {
     );
   }
 
+  void _showGenerateSheet() {
+    showAgentGenerateSheet(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.sanbaoColors;
@@ -70,11 +75,25 @@ class _AgentListScreenState extends ConsumerState<AgentListScreen> {
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToCreate,
-        backgroundColor: colors.accent,
-        foregroundColor: colors.textInverse,
-        child: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'agent_generate',
+            onPressed: _showGenerateSheet,
+            backgroundColor: colors.bgSurface,
+            foregroundColor: colors.accent,
+            child: const Icon(Icons.auto_awesome_rounded),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton(
+            heroTag: 'agent_create',
+            onPressed: _navigateToCreate,
+            backgroundColor: colors.accent,
+            foregroundColor: colors.textInverse,
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(agentsListProvider.notifier).refresh(),
