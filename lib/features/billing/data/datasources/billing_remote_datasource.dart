@@ -12,6 +12,7 @@ import 'package:sanbao_flutter/features/billing/data/models/usage_model.dart';
 import 'package:sanbao_flutter/features/billing/domain/entities/plan.dart';
 import 'package:sanbao_flutter/features/billing/domain/entities/subscription.dart';
 import 'package:sanbao_flutter/features/billing/domain/entities/usage.dart';
+import 'package:sanbao_flutter/features/billing/domain/repositories/billing_repository.dart';
 
 /// Remote data source for billing operations via the REST API.
 class BillingRemoteDataSource {
@@ -24,48 +25,38 @@ class BillingRemoteDataSource {
 
   /// Fetches all available plans.
   ///
-  /// GET /api/billing/plans
+  /// GET /api/billing/plans → JSON array of plan objects.
   Future<List<Plan>> getPlans() async {
-    final response = await _dioClient.get<Map<String, Object?>>(
+    final response = await _dioClient.get<List<dynamic>>(
       '$_basePath/plans',
     );
 
-    final plansJson = response['plans'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
-
-    return PlanModel.fromJsonList(plansJson);
+    return PlanModel.fromJsonList(response.cast<Object?>());
   }
 
-  /// Fetches the current user's subscription.
+  /// Fetches the current user's subscription from the combined endpoint.
   ///
-  /// GET /api/billing/subscription
+  /// GET /api/billing/current → {plan, subscription, usage, monthlyUsage, expired}
   Future<Subscription?> getCurrentSubscription() async {
-    final response = await _dioClient.get<Map<String, Object?>>(
-      '$_basePath/subscription',
-    );
-
-    final subJson = response['subscription'] as Map<String, Object?>? ??
-        (response.containsKey('id') ? response : null);
-
+    final current = await _fetchCurrent();
+    final subJson = current['subscription'] as Map<String, Object?>?;
     if (subJson == null) return null;
-
     return SubscriptionModel.fromJson(subJson).subscription;
   }
 
-  /// Fetches the current user's usage for this billing period.
+  /// Fetches the current user's usage from the combined endpoint.
   ///
-  /// GET /api/billing/usage
+  /// GET /api/billing/current → {plan, subscription, usage, monthlyUsage, expired}
   Future<Usage> getUsage() async {
-    final response = await _dioClient.get<Map<String, Object?>>(
-      '$_basePath/usage',
-    );
+    final current = await _fetchCurrent();
+    final usageJson = current['usage'] as Map<String, Object?>? ?? {};
+    final planJson = current['plan'] as Map<String, Object?>?;
+    return UsageModel.fromCurrentJson(usageJson, planJson).usage;
+  }
 
-    final usageJson = response['usage'] as Map<String, Object?>? ??
-        (response.containsKey('messagesUsed') ? response : null) ??
-        {};
-
-    return UsageModel.fromJson(usageJson).usage;
+  /// Fetches the combined /api/billing/current endpoint.
+  Future<Map<String, Object?>> _fetchCurrent() async {
+    return _dioClient.get<Map<String, Object?>>('$_basePath/current');
   }
 
   /// Creates a Stripe checkout session URL.
@@ -105,6 +96,27 @@ class BillingRemoteDataSource {
         [];
 
     return PaymentHistoryItemModel.fromJsonList(historyJson);
+  }
+
+  /// Applies a promotional code.
+  ///
+  /// POST /api/billing/apply-promo
+  /// Returns a map with `valid` (bool), `discount` (int), `message` (String).
+  Future<PromoCodeResult> applyPromoCode(String code) async {
+    final response = await _dioClient.post<Map<String, Object?>>(
+      '$_basePath/apply-promo',
+      data: {'code': code},
+    );
+
+    final valid = response['valid'] as bool? ?? false;
+    final discount = response['discount'] as int? ?? 0;
+    final message = response['message'] as String? ?? '';
+
+    return PromoCodeResult(
+      valid: valid,
+      discount: discount,
+      message: message,
+    );
   }
 }
 

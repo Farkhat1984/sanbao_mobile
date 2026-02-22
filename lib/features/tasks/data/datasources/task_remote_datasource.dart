@@ -17,16 +17,14 @@ class TaskRemoteDataSource {
   final DioClient _dioClient;
 
   /// Fetches all tasks for the current user.
+  ///
+  /// GET /api/tasks → JSON array of task objects.
   Future<List<Task>> getAll() async {
-    final response = await _dioClient.get<Map<String, Object?>>(
+    final response = await _dioClient.get<List<dynamic>>(
       AppConfig.tasksEndpoint,
     );
 
-    final tasksJson = response['tasks'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
-
-    return TaskModel.fromJsonList(tasksJson);
+    return TaskModel.fromJsonList(response.cast<Object?>());
   }
 
   /// Fetches a single task by [id] with full step details.

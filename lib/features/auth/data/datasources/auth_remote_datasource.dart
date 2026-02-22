@@ -16,7 +16,7 @@ import 'package:sanbao_flutter/features/auth/data/models/user_model.dart';
 /// Endpoints:
 /// - POST /api/auth/login
 /// - POST /api/auth/register
-/// - POST /api/auth/google
+/// - POST /api/auth/mobile/google
 /// - POST /api/auth/apple
 /// - POST /api/auth/whatsapp/request
 /// - POST /api/auth/whatsapp/verify
@@ -37,6 +37,7 @@ class AuthRemoteDataSource {
   ///
   /// Returns a map containing `user` and `tokens` on success.
   /// The server may return a 2FA_REQUIRED error if 2FA is enabled.
+  /// Backend returns `{token, user, expiresAt}` (Bearer token format).
   Future<({UserModel user, TokenModel tokens})> login({
     required String email,
     required String password,
@@ -56,9 +57,7 @@ class AuthRemoteDataSource {
     final user = UserModel.fromJson(
       response['user']! as Map<String, Object?>,
     );
-    final tokens = TokenModel.fromJson(
-      response['tokens']! as Map<String, Object?>,
-    );
+    final tokens = _parseBearerTokenResponse(response);
 
     return (user: user, tokens: tokens);
   }
@@ -87,11 +86,12 @@ class AuthRemoteDataSource {
   /// Authenticates or links a Google account via ID token.
   ///
   /// Returns the user and tokens if the account exists or was created.
+  /// Backend endpoint: POST /api/auth/mobile/google → {token, user, expiresAt}
   Future<({UserModel user, TokenModel tokens})> signInWithGoogle({
     required String idToken,
   }) async {
     final response = await _dioClient.post<Map<String, Object?>>(
-      '$_basePath/google',
+      '$_basePath/mobile/google',
       data: {'idToken': idToken},
     );
 
@@ -100,9 +100,7 @@ class AuthRemoteDataSource {
     final user = UserModel.fromJson(
       response['user']! as Map<String, Object?>,
     );
-    final tokens = TokenModel.fromJson(
-      response['tokens']! as Map<String, Object?>,
-    );
+    final tokens = _parseBearerTokenResponse(response);
 
     return (user: user, tokens: tokens);
   }
@@ -110,9 +108,9 @@ class AuthRemoteDataSource {
   /// Authenticates or links an Apple account via identity token.
   ///
   /// Returns the user and tokens if the account exists or was created.
+  /// Backend endpoint: POST /api/auth/apple → {token, user, expiresAt}
   Future<({UserModel user, TokenModel tokens})> signInWithApple({
     required String identityToken,
-    required String authorizationCode,
     String? email,
     String? fullName,
     String? nonce,
@@ -121,7 +119,6 @@ class AuthRemoteDataSource {
       '$_basePath/apple',
       data: {
         'identityToken': identityToken,
-        'authorizationCode': authorizationCode,
         if (email != null) 'email': email,
         if (fullName != null) 'fullName': fullName,
         if (nonce != null) 'nonce': nonce,
@@ -133,9 +130,7 @@ class AuthRemoteDataSource {
     final user = UserModel.fromJson(
       response['user']! as Map<String, Object?>,
     );
-    final tokens = TokenModel.fromJson(
-      response['tokens']! as Map<String, Object?>,
-    );
+    final tokens = _parseBearerTokenResponse(response);
 
     return (user: user, tokens: tokens);
   }
@@ -246,6 +241,22 @@ class AuthRemoteDataSource {
     );
 
     return response;
+  }
+
+  /// Parses a Bearer-token response from mobile auth endpoints.
+  ///
+  /// Backend returns `{token, expiresAt}` (single Bearer token, no refresh).
+  /// We map `token` → `accessToken` and use it as `refreshToken` too since
+  /// the proxy middleware converts Bearer → NextAuth session cookie.
+  TokenModel _parseBearerTokenResponse(Map<String, Object?> response) {
+    final token = response['token']! as String;
+    return TokenModel(
+      accessToken: token,
+      refreshToken: token,
+      expiresAt: response['expiresAt'] is String
+          ? DateTime.parse(response['expiresAt']! as String)
+          : DateTime.now().add(const Duration(days: 30)),
+    );
   }
 
   /// Validates that the response indicates success.

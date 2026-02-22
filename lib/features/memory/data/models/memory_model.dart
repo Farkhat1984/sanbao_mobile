@@ -15,11 +15,15 @@ class MemoryModel {
       MemoryModel._(memory: memory);
 
   /// Creates a model from an API JSON response.
+  ///
+  /// Backend returns `{id, userId, key, content, source, createdAt, updatedAt}`.
+  /// We map `key` → `category` for the domain entity.
   factory MemoryModel.fromJson(Map<String, Object?> json) => MemoryModel._(
         memory: Memory(
           id: json['id'] as String? ?? '',
           content: json['content'] as String? ?? '',
-          category: json['category'] as String?,
+          category: json['category'] as String? ??
+              json['key'] as String?,
           userId: json['userId'] as String?,
           createdAt:
               DateTime.tryParse(json['createdAt'] as String? ?? '') ??

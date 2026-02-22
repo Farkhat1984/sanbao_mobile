@@ -25,7 +25,7 @@ class TaskModel {
         steps: stepsJson != null
             ? TaskStepModel.fromJsonList(stepsJson)
             : const [],
-        progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
+        progress: ((json['progress'] as num?)?.toDouble() ?? 0.0) / 100.0,
         conversationId: json['conversationId'] as String?,
         createdAt:
             DateTime.tryParse(json['createdAt'] as String? ?? '') ??
@@ -44,10 +44,11 @@ class TaskModel {
       .toList();
 
   static TaskStatus _parseStatus(String status) =>
-      switch (status.toLowerCase()) {
-        'running' => TaskStatus.running,
-        'completed' => TaskStatus.completed,
-        'failed' => TaskStatus.failed,
+      switch (status.toUpperCase()) {
+        'RUNNING' || 'IN_PROGRESS' => TaskStatus.running,
+        'COMPLETED' => TaskStatus.completed,
+        'FAILED' => TaskStatus.failed,
+        'PAUSED' || 'PENDING' => TaskStatus.pending,
         _ => TaskStatus.pending,
       };
 }

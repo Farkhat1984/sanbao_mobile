@@ -1,6 +1,8 @@
 /// Data model for usage tracking.
 ///
 /// Handles JSON serialization/deserialization for Usage and PaymentHistoryItem.
+/// Supports both the legacy format (`{messagesUsed, messagesLimit, ...}`) and
+/// the backend /api/billing/current format (`{messageCount, tokenCount}` + plan limits).
 library;
 
 import 'package:sanbao_flutter/features/billing/domain/entities/usage.dart';
@@ -9,15 +11,48 @@ import 'package:sanbao_flutter/features/billing/domain/entities/usage.dart';
 class UsageModel {
   const UsageModel._({required this.usage});
 
-  /// Parses a [UsageModel] from a JSON map.
+  /// Parses a [UsageModel] from a JSON map (legacy format).
   factory UsageModel.fromJson(Map<String, Object?> json) => UsageModel._(
         usage: Usage(
-          messagesUsed: json['messagesUsed'] as int? ?? 0,
-          messagesLimit: json['messagesLimit'] as int? ?? 0,
-          tokensUsed: json['tokensUsed'] as int? ?? 0,
-          tokensLimit: json['tokensLimit'] as int? ?? 0,
-          storageUsed: json['storageUsed'] as int? ?? 0,
-          storageLimit: json['storageLimit'] as int? ?? 0,
+          messagesUsed: (json['messagesUsed'] as num?)?.toInt() ??
+              (json['messageCount'] as num?)?.toInt() ??
+              0,
+          messagesLimit: (json['messagesLimit'] as num?)?.toInt() ?? 0,
+          tokensUsed: (json['tokensUsed'] as num?)?.toInt() ??
+              (json['tokenCount'] as num?)?.toInt() ??
+              0,
+          tokensLimit: (json['tokensLimit'] as num?)?.toInt() ?? 0,
+          storageUsed: (json['storageUsed'] as num?)?.toInt() ?? 0,
+          storageLimit: (json['storageLimit'] as num?)?.toInt() ?? 0,
+        ),
+      );
+
+  /// Parses usage from the /api/billing/current response.
+  ///
+  /// [usageJson] is `{messageCount, tokenCount}` from the `usage` field.
+  /// [planJson] is the `plan` object containing limits like `messagesPerDay`, `tokensPerMonth`.
+  factory UsageModel.fromCurrentJson(
+    Map<String, Object?> usageJson,
+    Map<String, Object?>? planJson,
+  ) =>
+      UsageModel._(
+        usage: Usage(
+          messagesUsed: (usageJson['messageCount'] as num?)?.toInt() ??
+              (usageJson['messagesUsed'] as num?)?.toInt() ??
+              0,
+          messagesLimit:
+              (planJson?['messagesPerDay'] as num?)?.toInt() ??
+                  (usageJson['messagesLimit'] as num?)?.toInt() ??
+                  0,
+          tokensUsed: (usageJson['tokenCount'] as num?)?.toInt() ??
+              (usageJson['tokensUsed'] as num?)?.toInt() ??
+              0,
+          tokensLimit:
+              (planJson?['tokensPerMonth'] as num?)?.toInt() ??
+                  (usageJson['tokensLimit'] as num?)?.toInt() ??
+                  0,
+          storageUsed: (usageJson['storageUsed'] as num?)?.toInt() ?? 0,
+          storageLimit: (usageJson['storageLimit'] as num?)?.toInt() ?? 0,
         ),
       );
 

@@ -17,28 +17,31 @@ class MemoryRemoteDataSource {
   final DioClient _dioClient;
 
   /// Fetches all memories for the current user.
+  ///
+  /// GET /api/memory → JSON array of memory objects.
   Future<List<Memory>> getAll() async {
-    final response = await _dioClient.get<Map<String, Object?>>(
+    final response = await _dioClient.get<List<dynamic>>(
       AppConfig.memoryEndpoint,
     );
 
-    final memoriesJson = response['memories'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
-
-    return MemoryModel.fromJsonList(memoriesJson);
+    return MemoryModel.fromJsonList(response.cast<Object?>());
   }
 
   /// Creates a new memory.
+  ///
+  /// Backend expects `{key, content, source?}` where `key` is unique per user.
+  /// We map [category] → `key` for the backend.
   Future<Memory> create({
     required String content,
     String? category,
   }) async {
+    final key = category ?? 'memo_${DateTime.now().millisecondsSinceEpoch}';
     final response = await _dioClient.post<Map<String, Object?>>(
       AppConfig.memoryEndpoint,
       data: {
+        'key': key,
         'content': content,
-        if (category != null) 'category': category,
+        'source': 'manual',
       },
     );
 
@@ -46,6 +49,8 @@ class MemoryRemoteDataSource {
   }
 
   /// Updates an existing memory.
+  ///
+  /// Backend expects `{key?, content?, source?}`.
   Future<Memory> update({
     required String id,
     String? content,
@@ -55,7 +60,8 @@ class MemoryRemoteDataSource {
       '${AppConfig.memoryEndpoint}/$id',
       data: {
         if (content != null) 'content': content,
-        if (category != null) 'category': category,
+        if (category != null) 'key': category,
+        'source': 'manual',
       },
     );
 
