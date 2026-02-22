@@ -490,7 +490,7 @@ class _FeatureNavSection extends StatelessWidget {
     final colors = context.sanbaoColors;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(color: colors.border, width: 0.5),
@@ -511,7 +511,7 @@ class _FeatureNavSection extends StatelessWidget {
           ),
           _NavIcon(
             icon: Icons.build_rounded,
-            label: 'Инструменты',
+            label: 'Тулы',
             path: RoutePaths.tools,
           ),
           _NavIcon(
@@ -562,11 +562,11 @@ class _NavIcon extends StatelessWidget {
           },
           borderRadius: BorderRadius.circular(8),
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: 20, color: colors.textSecondary),
+                Icon(icon, size: 18, color: colors.textSecondary),
                 const SizedBox(height: 2),
                 Text(
                   label,
