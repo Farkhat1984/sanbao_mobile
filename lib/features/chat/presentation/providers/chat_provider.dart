@@ -278,7 +278,6 @@ class ChatController {
       agentId: agentId,
       thinkingEnabled: thinkingEnabled,
       webSearchEnabled: webSearchEnabled,
-      planningEnabled: false,
       attachments: messageAttachments,
     );
 
