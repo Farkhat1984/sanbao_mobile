@@ -111,12 +111,6 @@ class _ThinkingIndicatorState extends State<ThinkingIndicator>
               dotColor: Color(0xFF10B981),
             ),
       StreamingPhase.usingTool => _toolVisuals(category),
-      StreamingPhase.planning => _ThinkingVisuals(
-          icon: Icons.checklist_rounded,
-          label: '$name составляет план',
-          gradientColors: const [Color(0xFFF59E0B), Color(0xFFF97316)],
-          dotColor: const Color(0xFFF59E0B),
-        ),
       StreamingPhase.answering => _ThinkingVisuals(
           icon: Icons.chat_rounded,
           label: '$name отвечает',

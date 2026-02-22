@@ -253,16 +253,8 @@ class _MessageInputState extends ConsumerState<MessageInput>
             bottom: bottomPadding > 0 ? bottomPadding + 4 : 12,
           ),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                colors.bg.withValues(alpha: 0.0),
-                colors.bg.withValues(alpha: 0.8),
-                colors.bg,
-              ],
-              stops: const [0.0, 0.3, 1.0],
-            ),
+            color: colors.bg,
+            border: Border(top: BorderSide(color: colors.border)),
           ),
           child: SafeArea(
             top: false,
@@ -281,7 +273,7 @@ class _MessageInputState extends ConsumerState<MessageInput>
                   child: Container(
                     constraints: const BoxConstraints(
                       minHeight: 48,
-                      maxHeight: 160,
+                      maxHeight: 200,
                     ),
                     decoration: BoxDecoration(
                       color: colors.bgSurface,
@@ -388,7 +380,7 @@ class _MessageInputState extends ConsumerState<MessageInput>
         controller: _textController,
         focusNode: _focusNode,
         enabled: widget.enabled,
-        maxLines: 6,
+        maxLines: null,
         minLines: 1,
         textInputAction: TextInputAction.newline,
         keyboardType: TextInputType.multiline,

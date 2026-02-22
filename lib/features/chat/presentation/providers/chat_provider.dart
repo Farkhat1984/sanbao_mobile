@@ -201,9 +201,6 @@ final thinkingEnabledProvider = StateProvider<bool>((ref) => true);
 /// Whether web search is enabled.
 final webSearchEnabledProvider = StateProvider<bool>((ref) => false);
 
-/// Whether planning mode is enabled.
-final planningEnabledProvider = StateProvider<bool>((ref) => false);
-
 // ---- Send Message ----
 
 /// Provider for the send message use case.
@@ -245,8 +242,6 @@ class ChatController {
     final messages = _ref.read(messagesProvider);
     final thinkingEnabled = _ref.read(thinkingEnabledProvider);
     final webSearchEnabled = _ref.read(webSearchEnabledProvider);
-    final planningEnabled = _ref.read(planningEnabledProvider);
-
     // Create user message (with optional attachments for UI display)
     final userMessage = Message.user(
       id: _generateId(),
@@ -283,7 +278,7 @@ class ChatController {
       agentId: agentId,
       thinkingEnabled: thinkingEnabled,
       webSearchEnabled: webSearchEnabled,
-      planningEnabled: planningEnabled,
+      planningEnabled: false,
       attachments: messageAttachments,
     );
 
@@ -324,7 +319,7 @@ class ChatController {
 
       case PlanEvent(:final text):
         _ref.read(streamingPhaseProvider.notifier).state =
-            StreamingPhase.planning;
+            StreamingPhase.answering;
         messagesNotifier.updateLastAssistantMessage(
           appendPlan: text,
         );

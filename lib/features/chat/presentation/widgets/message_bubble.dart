@@ -211,10 +211,6 @@ class _MessageBubbleState extends State<MessageBubble>
             if (widget.message.hasReasoning)
               _buildReasoningSection(context),
 
-            // Plan section
-            if (widget.message.hasPlan)
-              _buildPlanSection(context),
-
             // Main content (Markdown)
             if (widget.message.hasContent)
               MarkdownRenderer(
@@ -368,51 +364,6 @@ class _MessageBubbleState extends State<MessageBubble>
       ),
     );
   }
-
-  // ---- Plan Section ----
-
-  Widget _buildPlanSection(BuildContext context) => Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF59E0B).withValues(alpha: 0.06),
-          borderRadius: SanbaoRadius.sm,
-          border: Border.all(
-            color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
-            width: 0.5,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.checklist_rounded,
-                  size: 14,
-                  color: Color(0xFFF59E0B),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  'План',
-                  style: context.textTheme.labelSmall?.copyWith(
-                    color: const Color(0xFFF59E0B),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            MarkdownRenderer(
-              content: widget.message.planContent!,
-              selectable: false,
-            ),
-          ],
-        ),
-      ),
-    );
 
   // ---- Error Bubble ----
 

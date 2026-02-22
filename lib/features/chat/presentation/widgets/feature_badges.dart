@@ -1,7 +1,7 @@
 /// Feature toggle badges shown above the message input.
 ///
 /// Displays a horizontal row of tappable pills for toggling
-/// AI features like Thinking, Web Search, Planning, and Image Generation.
+/// AI features like Thinking, Web Search, and Image Generation.
 library;
 
 import 'package:flutter/material.dart';
@@ -25,8 +25,6 @@ class FeatureBadges extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final thinkingEnabled = ref.watch(thinkingEnabledProvider);
     final webSearchEnabled = ref.watch(webSearchEnabledProvider);
-    final planningEnabled = ref.watch(planningEnabledProvider);
-
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -51,17 +49,6 @@ class FeatureBadges extends ConsumerWidget {
               HapticFeedback.selectionClick();
               ref.read(webSearchEnabledProvider.notifier).state =
                   !webSearchEnabled;
-            },
-          ),
-          const SizedBox(width: 8),
-          _FeatureBadge(
-            icon: Icons.account_tree_rounded,
-            label: 'План',
-            isActive: planningEnabled,
-            onTap: () {
-              HapticFeedback.selectionClick();
-              ref.read(planningEnabledProvider.notifier).state =
-                  !planningEnabled;
             },
           ),
           if (AppConfig.enableImageGeneration) ...[

@@ -17,9 +17,6 @@ enum StreamingPhase {
   /// AI is using a specific tool.
   usingTool,
 
-  /// AI is generating a plan.
-  planning,
-
   /// AI is producing the response content.
   answering;
 
@@ -28,7 +25,6 @@ enum StreamingPhase {
         StreamingPhase.thinking => 'Думает',
         StreamingPhase.searching => 'Ищет',
         StreamingPhase.usingTool => 'Использует инструменты',
-        StreamingPhase.planning => 'Составляет план',
         StreamingPhase.answering => 'Отвечает',
       };
 }
@@ -89,7 +85,7 @@ enum ToolCategory {
 /// Used by the chat provider to track what the AI is currently doing.
 StreamingPhase? phaseFromEvent(ndjson.ChatEvent event) => switch (event) {
       ndjson.ReasoningEvent() => StreamingPhase.thinking,
-      ndjson.PlanEvent() => StreamingPhase.planning,
+      ndjson.PlanEvent() => StreamingPhase.answering,
       ndjson.ContentEvent() => StreamingPhase.answering,
       ndjson.StatusEvent(:final status) => switch (status) {
           'searching' => StreamingPhase.searching,
