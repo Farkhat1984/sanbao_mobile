@@ -7,7 +7,6 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/features/mcp/data/repositories/mcp_repository_impl.dart';
 import 'package:sanbao_flutter/features/mcp/domain/entities/mcp_server.dart';
-import 'package:sanbao_flutter/features/mcp/domain/repositories/mcp_repository.dart';
 
 // ---- MCP Server List ----
 
@@ -114,7 +113,7 @@ final filteredMcpServersProvider =
         .where((s) =>
             query.isEmpty ||
             s.name.toLowerCase().contains(query) ||
-            s.url.toLowerCase().contains(query))
+            s.url.toLowerCase().contains(query),)
         .toList(),
   );
 });

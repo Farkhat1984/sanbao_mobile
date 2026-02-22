@@ -1,4 +1,4 @@
-package com.sanbao.mobile.sanbao_flutter
+package com.sanbao.sanbaoai
 
 import io.flutter.embedding.android.FlutterActivity
 

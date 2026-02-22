@@ -127,7 +127,7 @@ class _AnimatedEntryState extends State<_AnimatedEntry>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: SanbaoAnimations.smoothCurve,
-    ));
+    ),);
 
     Future<void>.delayed(widget.delay, () {
       if (mounted) _controller.forward();
@@ -141,13 +141,11 @@ class _AnimatedEntryState extends State<_AnimatedEntry>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
+  Widget build(BuildContext context) => FadeTransition(
       opacity: _opacity,
       child: SlideTransition(
         position: _slide,
         child: widget.child,
       ),
     );
-  }
 }

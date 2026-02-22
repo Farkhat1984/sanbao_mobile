@@ -59,8 +59,8 @@ class _AgentFormScreenState extends ConsumerState<AgentFormScreen> {
     super.initState();
     // Initialize form data after the first frame so the provider is ready
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final formNotifier = ref.read(agentFormProvider.notifier);
-      formNotifier.initialize(agent: widget.existingAgent);
+      ref.read(agentFormProvider.notifier)
+        .initialize(agent: widget.existingAgent);
 
       final form = ref.read(agentFormProvider);
       _nameController.text = form.name;
@@ -352,7 +352,7 @@ class _AgentFormScreenState extends ConsumerState<AgentFormScreen> {
             ),
           ),
           const SizedBox(height: 6),
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: colors.bgSurfaceAlt,
               borderRadius: SanbaoRadius.md,
@@ -374,12 +374,10 @@ class _AgentFormScreenState extends ConsumerState<AgentFormScreen> {
                   Icons.keyboard_arrow_down,
                   color: colors.textMuted,
                 ),
-                items: _modelOptions.map((model) {
-                  return DropdownMenuItem(
+                items: _modelOptions.map((model) => DropdownMenuItem(
                     value: model.id,
                     child: Text(model.label),
-                  );
-                }).toList(),
+                  ),).toList(),
                 onChanged: (value) {
                   if (value != null) {
                     ref.read(agentFormProvider.notifier).updateModel(value);

@@ -5,19 +5,23 @@
 /// provider overrides.
 library;
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sanbao_flutter/app.dart';
 import 'package:sanbao_flutter/core/errors/error_handler.dart';
 import 'package:sanbao_flutter/core/storage/local_db.dart';
 import 'package:sanbao_flutter/core/storage/preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   await ErrorHandler.initialize(
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
+
+      // Initialize Firebase
+      await Firebase.initializeApp();
 
       // Lock orientation to portrait on phones
       await SystemChrome.setPreferredOrientations([

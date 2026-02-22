@@ -75,6 +75,15 @@ class BillingRepositoryImpl implements BillingRepository {
     }
   }
 
+  @override
+  Future<PromoCodeResult> applyPromoCode(String code) async {
+    try {
+      return await _remoteDataSource.applyPromoCode(code);
+    } on ApiException catch (e) {
+      throw _mapException(e);
+    }
+  }
+
   /// Maps API exceptions to domain failures.
   Failure _mapException(ApiException exception) => switch (exception) {
         UnauthorizedException() =>

@@ -112,7 +112,7 @@ class _AgentCardState extends State<AgentCard>
           ),
           const Spacer(),
           if (agent.isSystem)
-            SanbaoBadge(
+            const SanbaoBadge(
               label: 'Системный',
               variant: SanbaoBadgeVariant.neutral,
               size: SanbaoBadgeSize.small,
@@ -146,7 +146,6 @@ class _AgentCardState extends State<AgentCard>
           if (agent.tools.isNotEmpty)
             SanbaoBadge(
               label: '${agent.tools.length} инстр.',
-              variant: SanbaoBadgeVariant.accent,
               icon: Icons.build_outlined,
               size: SanbaoBadgeSize.small,
             ),

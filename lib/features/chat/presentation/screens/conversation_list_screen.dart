@@ -324,8 +324,7 @@ class _LoadingSkeleton extends StatelessWidget {
   const _LoadingSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
+  Widget build(BuildContext context) => ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       children: [
         // Section header skeleton
@@ -337,7 +336,6 @@ class _LoadingSkeleton extends StatelessWidget {
         for (var i = 0; i < 8; i++) const SanbaoConversationSkeleton(),
       ],
     );
-  }
 }
 
 // ---- Sealed list item types ----

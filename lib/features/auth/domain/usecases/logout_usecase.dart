@@ -3,8 +3,8 @@
 /// Clears local tokens and notifies the server of session termination.
 library;
 
-import 'package:sanbao_flutter/core/errors/failure.dart';
 import 'package:sanbao_flutter/core/errors/error_handler.dart';
+import 'package:sanbao_flutter/core/errors/failure.dart';
 import 'package:sanbao_flutter/features/auth/domain/repositories/auth_repository.dart';
 
 /// Logs out the current user by clearing stored tokens.

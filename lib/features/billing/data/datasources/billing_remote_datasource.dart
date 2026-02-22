@@ -55,9 +55,7 @@ class BillingRemoteDataSource {
   }
 
   /// Fetches the combined /api/billing/current endpoint.
-  Future<Map<String, Object?>> _fetchCurrent() async {
-    return _dioClient.get<Map<String, Object?>>('$_basePath/current');
-  }
+  Future<Map<String, Object?>> _fetchCurrent() async => _dioClient.get<Map<String, Object?>>('$_basePath/current');
 
   /// Creates a Stripe checkout session URL.
   ///

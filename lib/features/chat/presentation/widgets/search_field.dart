@@ -122,13 +122,12 @@ class _SearchFieldState extends State<SearchField> {
             fillColor: colors.bgSurfaceAlt,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 8,
-              vertical: 0,
             ),
-            border: OutlineInputBorder(
+            border: const OutlineInputBorder(
               borderRadius: SanbaoRadius.sm,
               borderSide: BorderSide.none,
             ),
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: const OutlineInputBorder(
               borderRadius: SanbaoRadius.sm,
               borderSide: BorderSide.none,
             ),

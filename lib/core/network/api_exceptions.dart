@@ -22,7 +22,7 @@ sealed class ApiException implements Exception {
 
   @override
   String toString() =>
-      'ApiException($runtimeType): $message [status=$statusCode, path=$requestPath]';
+      'ApiException: $message [status=$statusCode, path=$requestPath]';
 }
 
 /// 401 - User is not authenticated.

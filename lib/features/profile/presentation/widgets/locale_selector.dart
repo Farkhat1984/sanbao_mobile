@@ -67,7 +67,7 @@ class LocaleSelector extends StatelessWidget {
           ),
           const SizedBox(height: 6),
         ],
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: colors.bgSurfaceAlt,
             borderRadius: SanbaoRadius.md,
@@ -84,8 +84,7 @@ class LocaleSelector extends StatelessWidget {
                 Icons.keyboard_arrow_down_rounded,
                 color: colors.textMuted,
               ),
-              items: _localeOptions.map((option) {
-                return DropdownMenuItem<String>(
+              items: _localeOptions.map((option) => DropdownMenuItem<String>(
                   value: option.code,
                   child: Row(
                     children: [
@@ -102,8 +101,7 @@ class LocaleSelector extends StatelessWidget {
                       ),
                     ],
                   ),
-                );
-              }).toList(),
+                ),).toList(),
               onChanged: (value) {
                 if (value != null) {
                   onLocaleChanged(value);

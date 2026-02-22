@@ -31,7 +31,7 @@ class TaskListScreen extends ConsumerStatefulWidget {
 
 class _TaskListScreenState extends ConsumerState<TaskListScreen> {
   void _openTaskDetail(Task task) {
-    showSanbaoBottomSheet(
+    showSanbaoBottomSheet<void>(
       context: context,
       builder: (context) => _TaskDetailSheet(taskId: task.id),
     );
@@ -68,7 +68,7 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
               ),
               data: (tasks) {
                 if (tasks.isEmpty) {
-                  return SliverToBoxAdapter(
+                  return const SliverToBoxAdapter(
                     child: EmptyState(
                       icon: Icons.task_alt_outlined,
                       title: 'Нет задач',

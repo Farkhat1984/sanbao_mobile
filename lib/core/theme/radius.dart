@@ -56,7 +56,7 @@ abstract final class SanbaoRadius {
       BorderRadius.all(Radius.circular(fullValue));
 
   /// No rounding.
-  static const BorderRadius none = BorderRadius.all(Radius.zero);
+  static const BorderRadius none = BorderRadius.zero;
 
   // ---- Message Bubble Radii ----
 

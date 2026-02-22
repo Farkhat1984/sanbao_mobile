@@ -33,4 +33,27 @@ abstract class BillingRepository {
 
   /// Fetches the user's payment history.
   Future<List<PaymentHistoryItem>> getPaymentHistory();
+
+  /// Applies a promotional code and returns the result.
+  Future<PromoCodeResult> applyPromoCode(String code);
+}
+
+/// Result of applying a promotional code.
+///
+/// Returned by [BillingRepository.applyPromoCode] after server validation.
+class PromoCodeResult {
+  const PromoCodeResult({
+    required this.valid,
+    required this.discount,
+    required this.message,
+  });
+
+  /// Whether the promo code is valid.
+  final bool valid;
+
+  /// Discount percentage (0-100).
+  final int discount;
+
+  /// Server-provided message about the promo code.
+  final String message;
 }

@@ -4,6 +4,8 @@
 /// timestamp, and supports swipe-to-pin and swipe-to-delete.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sanbao_flutter/core/theme/animations.dart';
@@ -72,7 +74,7 @@ class ConversationItem extends StatelessWidget {
         alignment: Alignment.centerRight,
       ),
       confirmDismiss: (direction) async {
-        HapticFeedback.lightImpact();
+        unawaited(HapticFeedback.lightImpact());
         if (direction == DismissDirection.startToEnd) {
           onPin?.call();
           return false; // Don't dismiss, just pin

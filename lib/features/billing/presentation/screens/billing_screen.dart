@@ -37,9 +37,9 @@ class BillingScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.read(subscriptionProvider.notifier).loadSubscription();
-          ref.read(usageProvider.notifier).loadUsage();
-          ref.read(paymentHistoryProvider.notifier).loadHistory();
+          await ref.read(subscriptionProvider.notifier).loadSubscription();
+          await ref.read(usageProvider.notifier).loadUsage();
+          await ref.read(paymentHistoryProvider.notifier).loadHistory();
         },
         color: colors.accent,
         child: ListView(
@@ -113,7 +113,7 @@ class _CurrentPlanSection extends ConsumerWidget {
     final planName =
         subscription?.plan?.displayName ?? 'Бесплатный';
     final isFree = subscription == null ||
-        subscription.plan?.isFree == true;
+        (subscription.plan?.isFree ?? false);
 
     return SanbaoCard(
       child: Column(
@@ -179,7 +179,6 @@ class _CurrentPlanSection extends ConsumerWidget {
               Expanded(
                 child: SanbaoButton(
                   label: isFree ? 'Улучшить план' : 'Сменить план',
-                  variant: SanbaoButtonVariant.primary,
                   size: SanbaoButtonSize.small,
                   leadingIcon: Icons.upgrade_rounded,
                   onPressed: () => context.push('/billing/plans'),
@@ -299,7 +298,7 @@ class _CurrentPlanSection extends ConsumerWidget {
     );
 
     if (confirmed && context.mounted) {
-      ref.read(subscriptionProvider.notifier).cancelSubscription();
+      await ref.read(subscriptionProvider.notifier).cancelSubscription();
     }
   }
 

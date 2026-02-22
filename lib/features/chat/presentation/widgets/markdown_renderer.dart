@@ -8,6 +8,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/theme/typography.dart';
@@ -132,7 +133,6 @@ class MarkdownRenderer extends StatelessWidget {
         // Inline code
         code: SanbaoTypography.codeStyle(
           color: colors.accent,
-          fontSize: 13,
         ).copyWith(
           backgroundColor: colors.bgSurfaceAlt,
         ),
@@ -197,8 +197,7 @@ class _CodeBlockBuilder extends MarkdownElementBuilder {
 
   @override
   Widget? visitElementAfter(
-    // ignore: prefer_void_to_null
-    element,
+    md.Element element,
     TextStyle? preferredStyle,
   ) {
     final textContent = element.textContent;
@@ -232,8 +231,7 @@ class _CodeBlock extends StatelessWidget {
   final SanbaoColorScheme colors;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
@@ -280,14 +278,12 @@ class _CodeBlock extends StatelessWidget {
               code,
               style: SanbaoTypography.codeStyle(
                 color: colors.textPrimary,
-                fontSize: 13,
               ),
             ),
           ),
         ],
       ),
     );
-  }
 }
 
 /// Copy-to-clipboard button with feedback animation.
@@ -315,8 +311,7 @@ class _CopyButtonState extends State<_CopyButton> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: _copy,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
@@ -335,5 +330,4 @@ class _CopyButtonState extends State<_CopyButton> {
               ),
       ),
     );
-  }
 }

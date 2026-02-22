@@ -65,8 +65,8 @@ class _AgentGenerateSheetState extends ConsumerState<_AgentGenerateSheet> {
 
   void _handleSuccess(Map<String, Object?> data) {
     // Pre-fill the agent form
-    final formNotifier = ref.read(agentFormProvider.notifier);
-    formNotifier.initialize();
+    final formNotifier = ref.read(agentFormProvider.notifier)
+      ..initialize();
 
     final name = data['name'] as String?;
     final description = data['description'] as String?;
@@ -173,8 +173,8 @@ class _AgentGenerateSheetState extends ConsumerState<_AgentGenerateSheet> {
                 Container(
                   width: 36,
                   height: 36,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0F0FF),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF0F0FF),
                     borderRadius: SanbaoRadius.sm,
                   ),
                   child: Icon(

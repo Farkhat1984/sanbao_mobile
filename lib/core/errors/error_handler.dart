@@ -48,13 +48,13 @@ abstract final class ErrorHandler {
       );
     } else {
       // Run without Sentry
-      runZonedGuarded(
-        () async {
-          await appRunner();
-        },
-        (error, stack) {
-          _reportError(error, stack);
-        },
+      unawaited(
+        runZonedGuarded(
+          () async {
+            await appRunner();
+          },
+          _reportError,
+        ),
       );
     }
   }
@@ -127,6 +127,7 @@ abstract final class ErrorHandler {
             tags.forEach(scope.setTag);
           }
           if (extra != null) {
+            // ignore: deprecated_member_use
             extra.forEach(scope.setExtra);
           }
         },
@@ -176,7 +177,7 @@ abstract final class ErrorHandler {
           id: id,
           email: email,
           name: name,
-        ));
+        ),);
       });
     }
   }

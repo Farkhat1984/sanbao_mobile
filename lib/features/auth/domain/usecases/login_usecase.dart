@@ -3,8 +3,8 @@
 /// Orchestrates email/password authentication through the repository.
 library;
 
-import 'package:sanbao_flutter/core/errors/failure.dart';
 import 'package:sanbao_flutter/core/errors/error_handler.dart';
+import 'package:sanbao_flutter/core/errors/failure.dart';
 import 'package:sanbao_flutter/features/auth/domain/entities/user.dart';
 import 'package:sanbao_flutter/features/auth/domain/repositories/auth_repository.dart';
 

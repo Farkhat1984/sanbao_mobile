@@ -207,7 +207,7 @@ class _SkillSelectorContentState extends ConsumerState<_SkillSelectorContent> {
     return skills
         .where((s) =>
             s.name.toLowerCase().contains(query) ||
-            (s.description?.toLowerCase().contains(query) ?? false))
+            (s.description?.toLowerCase().contains(query) ?? false),)
         .toList();
   }
 

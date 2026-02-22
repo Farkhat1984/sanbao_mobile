@@ -27,18 +27,14 @@ String _generateFileId() {
 /// The list of pending file attachments for the current message.
 final fileAttachmentsProvider =
     StateNotifierProvider<FileAttachmentsNotifier, List<PendingFileAttachment>>(
-  (ref) => FileAttachmentsNotifier(ref),
+  FileAttachmentsNotifier.new,
 );
 
 /// Whether there are any files attached to the current message.
-final hasFileAttachmentsProvider = Provider<bool>((ref) {
-  return ref.watch(fileAttachmentsProvider).isNotEmpty;
-});
+final hasFileAttachmentsProvider = Provider<bool>((ref) => ref.watch(fileAttachmentsProvider).isNotEmpty);
 
 /// The total number of attached files.
-final fileAttachmentCountProvider = Provider<int>((ref) {
-  return ref.watch(fileAttachmentsProvider).length;
-});
+final fileAttachmentCountProvider = Provider<int>((ref) => ref.watch(fileAttachmentsProvider).length);
 
 /// Whether all attached files have finished uploading.
 final allFilesUploadedProvider = Provider<bool>((ref) {
@@ -106,7 +102,6 @@ class FileAttachmentsNotifier
       mimeType: mimeType,
       bytes: bytes,
       localPath: localPath,
-      status: FileUploadStatus.pending,
     );
 
     state = [...state, attachment];
@@ -144,16 +139,14 @@ class FileAttachmentsNotifier
     _updateFile(localId, (f) => f.copyWith(
       status: FileUploadStatus.pending,
       progress: 0.0,
-      errorMessage: null,
-    ));
+    ),);
 
     _uploadFile(localId);
   }
 
   /// Converts all completed attachments to [MessageAttachment] entities
   /// for inclusion in the sent message.
-  List<MessageAttachment> toMessageAttachments() {
-    return state
+  List<MessageAttachment> toMessageAttachments() => state
         .where((f) => f.status == FileUploadStatus.completed)
         .map(
           (f) => MessageAttachment(
@@ -166,11 +159,9 @@ class FileAttachmentsNotifier
           ),
         )
         .toList();
-  }
 
   /// Converts completed attachments to the API payload format.
-  List<Map<String, Object?>> toApiAttachments() {
-    return state
+  List<Map<String, Object?>> toApiAttachments() => state
         .where((f) => f.status == FileUploadStatus.completed)
         .map(
           (f) => <String, Object?>{
@@ -182,7 +173,6 @@ class FileAttachmentsNotifier
           },
         )
         .toList();
-  }
 
   /// Starts the upload process for a file.
   Future<void> _uploadFile(String localId) async {
@@ -197,7 +187,7 @@ class FileAttachmentsNotifier
     _updateFile(localId, (f) => f.copyWith(
       status: FileUploadStatus.uploading,
       progress: 0.0,
-    ));
+    ),);
 
     try {
       final datasource = _ref.read(fileRemoteDataSourceProvider);
@@ -210,7 +200,7 @@ class FileAttachmentsNotifier
         onProgress: (progress) {
           _updateFile(localId, (f) => f.copyWith(
             progress: progress.clamp(0.0, 0.95),
-          ));
+          ),);
         },
       );
 
@@ -222,7 +212,7 @@ class FileAttachmentsNotifier
         serverUrl: response.url,
         thumbnailUrl: response.thumbnailUrl,
         parsedText: response.parsedText,
-      ));
+      ),);
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) return;
 
@@ -230,13 +220,13 @@ class FileAttachmentsNotifier
         status: FileUploadStatus.failed,
         progress: 0.0,
         errorMessage: _mapUploadError(e),
-      ));
+      ),);
     } on Object catch (e) {
       _updateFile(localId, (f) => f.copyWith(
         status: FileUploadStatus.failed,
         progress: 0.0,
         errorMessage: 'Ошибка загрузки: $e',
-      ));
+      ),);
     } finally {
       _cancelTokens.remove(localId);
     }

@@ -216,7 +216,7 @@ class _AgentDetailContent extends StatelessWidget {
                       ),
                     ),
                     if (agent.isSystem)
-                      SanbaoBadge(
+                      const SanbaoBadge(
                         label: 'Системный',
                         variant: SanbaoBadgeVariant.neutral,
                         size: SanbaoBadgeSize.small,
@@ -297,13 +297,10 @@ class _AgentDetailContent extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: agent.tools.map((tool) {
-              return SanbaoBadge(
+            children: agent.tools.map((tool) => SanbaoBadge(
                 label: tool.toolName,
-                variant: SanbaoBadgeVariant.accent,
                 icon: Icons.build_outlined,
-              );
-            }).toList(),
+              ),).toList(),
           ),
         ],
       );
@@ -326,13 +323,11 @@ class _AgentDetailContent extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: agent.skills.map((skill) {
-              return SanbaoBadge(
+            children: agent.skills.map((skill) => SanbaoBadge(
                 label: skill.skillName,
                 variant: SanbaoBadgeVariant.legal,
                 icon: Icons.psychology_outlined,
-              );
-            }).toList(),
+              ),).toList(),
           ),
         ],
       );
@@ -471,7 +466,7 @@ class _DetailSkeleton extends StatelessWidget {
                         height: 20,
                       ),
                       const SizedBox(height: 8),
-                      const SanbaoSkeleton.line(height: 14),
+                      const SanbaoSkeleton.line(),
                     ],
                   ),
                 ),

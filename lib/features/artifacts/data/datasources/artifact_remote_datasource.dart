@@ -103,7 +103,7 @@ class ArtifactRemoteDataSource {
     final items = response['versions'] as List<Object?>? ?? [];
     return items
         .map((item) =>
-            ArtifactVersionModel.fromJson(item! as Map<String, Object?>))
+            ArtifactVersionModel.fromJson(item! as Map<String, Object?>),)
         .toList();
   }
 

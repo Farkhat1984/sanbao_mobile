@@ -82,13 +82,10 @@ class UserFooter extends ConsumerWidget {
 
           // Admin badge (if applicable)
           if (user?.isAdmin ?? false)
-            _FooterIconButton(
+            const _FooterIconButton(
               icon: Icons.shield_rounded,
               tooltip: 'Админ',
-              onTap: () {
-                HapticFeedback.selectionClick();
-                // Admin panel navigation (placeholder)
-              },
+              onTap: HapticFeedback.selectionClick,
             ),
 
           // Settings button

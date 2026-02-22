@@ -8,13 +8,10 @@
 /// - File size display and error state handling
 library;
 
-import 'dart:typed_data';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sanbao_flutter/core/theme/animations.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
@@ -73,12 +70,10 @@ class _ImagePreviewGrid extends ConsumerWidget {
   final List<PendingFileAttachment> images;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Wrap(
+  Widget build(BuildContext context, WidgetRef ref) => Wrap(
       spacing: 6,
       runSpacing: 6,
-      children: images.map((image) {
-        return _PendingImageTile(
+      children: images.map((image) => _PendingImageTile(
           attachment: image,
           onRemove: () =>
               ref.read(fileAttachmentsProvider.notifier).removeFile(image.localId),
@@ -87,10 +82,8 @@ class _ImagePreviewGrid extends ConsumerWidget {
                   .read(fileAttachmentsProvider.notifier)
                   .retryUpload(image.localId)
               : null,
-        );
-      }).toList(),
+        ),).toList(),
     );
-  }
 }
 
 /// A single pending image thumbnail tile with progress and remove button.
@@ -129,7 +122,7 @@ class _PendingImageTile extends StatelessWidget {
             Positioned.fill(
               child: ClipRRect(
                 borderRadius: SanbaoRadius.sm,
-                child: Container(
+                child: ColoredBox(
                   color: Colors.black38,
                   child: Center(
                     child: SizedBox(
@@ -155,9 +148,9 @@ class _PendingImageTile extends StatelessWidget {
                 borderRadius: SanbaoRadius.sm,
                 child: GestureDetector(
                   onTap: onRetry,
-                  child: Container(
+                  child: ColoredBox(
                     color: colors.error.withValues(alpha: 0.3),
-                    child: Center(
+                    child: const Center(
                       child: Icon(
                         Icons.refresh_rounded,
                         color: Colors.white,
@@ -180,12 +173,11 @@ class _PendingImageTile extends StatelessWidget {
     );
   }
 
-  Widget _buildThumbnail(SanbaoColorScheme colors) {
-    // Show local bytes for preview
-    return Image.memory(
+  // Show local bytes for preview
+  Widget _buildThumbnail(SanbaoColorScheme colors) => Image.memory(
       attachment.bytes,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => Container(
+      errorBuilder: (_, __, ___) => ColoredBox(
         color: colors.bgSurfaceAlt,
         child: Icon(
           Icons.broken_image_rounded,
@@ -194,7 +186,6 @@ class _PendingImageTile extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// List of pending document attachments.
@@ -204,11 +195,9 @@ class _DocumentList extends ConsumerWidget {
   final List<PendingFileAttachment> documents;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
+  Widget build(BuildContext context, WidgetRef ref) => Column(
       mainAxisSize: MainAxisSize.min,
-      children: documents.map((doc) {
-        return Padding(
+      children: documents.map((doc) => Padding(
           padding: const EdgeInsets.only(bottom: 4),
           child: _PendingDocumentTile(
             attachment: doc,
@@ -220,10 +209,8 @@ class _DocumentList extends ConsumerWidget {
                     .retryUpload(doc.localId)
                 : null,
           ),
-        );
-      }).toList(),
+        ),).toList(),
     );
-  }
 }
 
 /// A single pending document tile with icon, name, size, progress.
@@ -492,7 +479,7 @@ class _SentImageTile extends StatelessWidget {
                 ? CachedNetworkImage(
                     imageUrl: imageUrl,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
+                    placeholder: (context, url) => ColoredBox(
                       color: colors.bgSurfaceAlt,
                       child: const Center(
                         child: SizedBox(
@@ -505,7 +492,7 @@ class _SentImageTile extends StatelessWidget {
                         ),
                       ),
                     ),
-                    errorWidget: (context, url, error) => Container(
+                    errorWidget: (context, url, error) => ColoredBox(
                       color: colors.bgSurfaceAlt,
                       child: Icon(
                         Icons.broken_image_rounded,
@@ -514,7 +501,7 @@ class _SentImageTile extends StatelessWidget {
                       ),
                     ),
                   )
-                : Container(
+                : ColoredBox(
                     color: colors.bgSurfaceAlt,
                     child: Icon(
                       Icons.image_rounded,
@@ -615,8 +602,7 @@ class _RemoveButton extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
         onTap();
@@ -624,7 +610,7 @@ class _RemoveButton extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.black54,
           shape: BoxShape.circle,
         ),
@@ -635,7 +621,6 @@ class _RemoveButton extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Returns the icon for a given MIME type.

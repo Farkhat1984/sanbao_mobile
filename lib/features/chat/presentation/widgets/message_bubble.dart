@@ -3,6 +3,8 @@
 /// User messages: right-aligned with blue gradient background.
 /// Assistant messages: left-aligned with markdown rendering,
 /// collapsible reasoning section, and inline artifact cards.
+/// Long-press on assistant messages shows a context menu with
+/// copy and report options.
 library;
 
 import 'package:flutter/material.dart';
@@ -17,6 +19,7 @@ import 'package:sanbao_flutter/features/chat/domain/entities/message.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/artifact_card.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/file_attachment.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/markdown_renderer.dart';
+import 'package:sanbao_flutter/features/chat/presentation/widgets/report_dialog.dart';
 
 /// A chat message bubble with different styles for user and assistant.
 ///
@@ -32,6 +35,7 @@ class MessageBubble extends StatefulWidget {
     this.onLegalReferenceTap,
     this.onCopy,
     this.onRetry,
+    this.onRegenerate,
     this.animate = true,
   });
 
@@ -52,6 +56,9 @@ class MessageBubble extends StatefulWidget {
 
   /// Callback when the retry action is triggered (for error messages).
   final VoidCallback? onRetry;
+
+  /// Callback when regenerate is triggered (for assistant messages).
+  final VoidCallback? onRegenerate;
 
   /// Whether to animate the bubble entrance.
   final bool animate;
@@ -93,12 +100,12 @@ class _MessageBubbleState extends State<MessageBubble>
       opacity: _enterController,
       child: SlideTransition(
         position: Tween<Offset>(
-          begin: Offset(0, SanbaoAnimations.messageAppearOffset / 100),
+          begin: const Offset(0, SanbaoAnimations.messageAppearOffset / 100),
           end: Offset.zero,
         ).animate(CurvedAnimation(
           parent: _enterController,
           curve: SanbaoAnimations.smoothCurve,
-        )),
+        ),),
         child: Padding(
           padding: EdgeInsets.only(
             left: isUser ? 48 : 16,
@@ -110,7 +117,7 @@ class _MessageBubbleState extends State<MessageBubble>
             crossAxisAlignment:
                 isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
-              isUser ? _buildUserBubble(context) : _buildAssistantBubble(context),
+              if (isUser) _buildUserBubble(context) else _buildAssistantBubble(context),
               if (widget.showTimestamp) _buildTimestamp(context),
             ],
           ),
@@ -182,7 +189,7 @@ class _MessageBubbleState extends State<MessageBubble>
     }
 
     return GestureDetector(
-      onLongPress: () => _showCopyMenu(context),
+      onLongPress: () => _showAssistantContextMenu(context),
       child: Container(
         constraints: BoxConstraints(
           maxWidth: context.screenWidth * 0.85,
@@ -227,8 +234,46 @@ class _MessageBubbleState extends State<MessageBubble>
                   onOpen: () => widget.onArtifactOpen?.call(artifact.id),
                 ),
               ),
+
+            // Action buttons (copy + regenerate) for finished messages
+            if (!widget.message.isStreaming && widget.message.hasContent)
+              _buildActionButtons(context),
           ],
         ),
+      ),
+    );
+  }
+
+  // ---- Action Buttons (Copy + Regenerate) ----
+
+  Widget _buildActionButtons(BuildContext context) {
+    final colors = context.sanbaoColors;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Copy button
+          _ActionButton(
+            icon: Icons.content_copy_rounded,
+            label: 'Копировать',
+            color: colors.textMuted,
+            onTap: () => _showCopyMenu(context),
+          ),
+          const SizedBox(width: 4),
+          // Regenerate button
+          if (widget.onRegenerate != null)
+            _ActionButton(
+              icon: Icons.refresh_rounded,
+              label: 'Повторить',
+              color: colors.textMuted,
+              onTap: () {
+                HapticFeedback.lightImpact();
+                widget.onRegenerate?.call();
+              },
+            ),
+        ],
       ),
     );
   }
@@ -326,10 +371,7 @@ class _MessageBubbleState extends State<MessageBubble>
 
   // ---- Plan Section ----
 
-  Widget _buildPlanSection(BuildContext context) {
-    final colors = context.sanbaoColors;
-
-    return Padding(
+  Widget _buildPlanSection(BuildContext context) => Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
         width: double.infinity,
@@ -371,7 +413,6 @@ class _MessageBubbleState extends State<MessageBubble>
         ),
       ),
     );
-  }
 
   // ---- Error Bubble ----
 
@@ -432,12 +473,10 @@ class _MessageBubbleState extends State<MessageBubble>
 
   // ---- Streaming Cursor ----
 
-  Widget _buildStreamingCursor(SanbaoColorScheme colors) {
-    return Padding(
+  Widget _buildStreamingCursor(SanbaoColorScheme colors) => Padding(
       padding: const EdgeInsets.only(top: 2),
       child: _BlinkingCursor(color: colors.accent),
     );
-  }
 
   // ---- Timestamp ----
 
@@ -467,6 +506,165 @@ class _MessageBubbleState extends State<MessageBubble>
     context.showSnackBar('Скопировано в буфер обмена');
     widget.onCopy?.call();
   }
+
+  // ---- Assistant Context Menu (Copy + Report) ----
+
+  void _showAssistantContextMenu(BuildContext context) {
+    HapticFeedback.mediumImpact();
+    final colors = context.sanbaoColors;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.bgSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(SanbaoRadius.lgValue),
+        ),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle
+              Container(
+                width: 32,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color: colors.borderHover,
+                  borderRadius: SanbaoRadius.full,
+                ),
+              ),
+              // Copy option
+              _ContextMenuItem(
+                icon: Icons.content_copy_rounded,
+                label: 'Копировать',
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _showCopyMenu(context);
+                },
+              ),
+              // Report option (only for assistant messages with content)
+              if (widget.message.isAssistant && widget.message.hasContent)
+                _ContextMenuItem(
+                  icon: Icons.flag_outlined,
+                  label: 'Пожаловаться',
+                  isDestructive: true,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _openReportDialog(context);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---- Report Dialog ----
+
+  Future<void> _openReportDialog(BuildContext context) async {
+    final submitted = await showReportDialog(
+      context: context,
+      messageId: widget.message.id,
+    );
+
+    if ((submitted ?? false) && context.mounted) {
+      context.showSuccessSnackBar('Жалоба отправлена');
+    }
+  }
+}
+
+/// A row item for the long-press context menu bottom sheet.
+class _ContextMenuItem extends StatelessWidget {
+  const _ContextMenuItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.isDestructive = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool isDestructive;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.sanbaoColors;
+    final textColor = isDestructive ? colors.error : colors.textPrimary;
+    final iconColor = isDestructive ? colors.error : colors.textSecondary;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          child: Row(
+            children: [
+              Icon(icon, size: 20, color: iconColor),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  label,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small action button for message actions (copy, regenerate).
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: SanbaoRadius.sm,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: color,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
 }
 
 /// A blinking text cursor for the streaming state.
@@ -499,8 +697,7 @@ class _BlinkingCursorState extends State<_BlinkingCursor>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: _controller,
       builder: (context, child) => Opacity(
         opacity: _controller.value,
@@ -515,5 +712,4 @@ class _BlinkingCursorState extends State<_BlinkingCursor>
         ),
       ),
     );
-  }
 }

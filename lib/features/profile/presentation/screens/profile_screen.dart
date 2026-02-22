@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:sanbao_flutter/core/theme/colors.dart';
-import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_avatar.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_badge.dart';
@@ -187,9 +185,9 @@ class _InfoSection extends StatelessWidget {
             value: user.email,
             trailing: user.emailVerified
                 ? Icon(Icons.verified_rounded,
-                    size: 16, color: colors.success)
+                    size: 16, color: colors.success,)
                 : Icon(Icons.warning_amber_rounded,
-                    size: 16, color: colors.warning),
+                    size: 16, color: colors.warning,),
           ),
           const SizedBox(height: 10),
           _InfoRow(
@@ -349,10 +347,7 @@ class _SecuritySection extends StatelessWidget {
 
 class _ActionsSection extends ConsumerWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.sanbaoColors;
-
-    return Column(
+  Widget build(BuildContext context, WidgetRef ref) => Column(
       children: [
         SizedBox(
           width: double.infinity,
@@ -362,6 +357,17 @@ class _ActionsSection extends ConsumerWidget {
             leadingIcon: Icons.credit_card_rounded,
             isExpanded: true,
             onPressed: () => context.push('/billing'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: SanbaoButton(
+            label: 'База знаний',
+            variant: SanbaoButtonVariant.secondary,
+            leadingIcon: Icons.menu_book_rounded,
+            isExpanded: true,
+            onPressed: () => context.push('/knowledge'),
           ),
         ),
         const SizedBox(height: 12),
@@ -390,5 +396,4 @@ class _ActionsSection extends ConsumerWidget {
         ),
       ],
     );
-  }
 }

@@ -39,7 +39,7 @@ class LocalDatabaseImpl implements LocalDatabase {
     final dir = await _dir;
     final file = File('${dir.path}/$namespace.json');
 
-    Map<String, Object?> store = {};
+    var store = <String, Object?>{};
     if (file.existsSync()) {
       try {
         final content = await file.readAsString();
@@ -109,8 +109,8 @@ class LocalDatabaseImpl implements LocalDatabase {
     try {
       final content = await file.readAsString();
       final store =
-          (jsonDecode(content) as Map<String, Object?>?) ?? {};
-      store.remove(key);
+          (jsonDecode(content) as Map<String, Object?>?) ?? {}
+            ..remove(key);
       await file.writeAsString(jsonEncode(store));
     } on FormatException {
       await file.delete();

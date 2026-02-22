@@ -500,7 +500,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          // TODO: Open terms of service
+                          // TODO(dev): Open terms of service
                         },
                     ),
                     const TextSpan(text: ' и '),
@@ -512,7 +512,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          // TODO: Open privacy policy
+                          // TODO(dev): Open privacy policy
                         },
                     ),
                   ],

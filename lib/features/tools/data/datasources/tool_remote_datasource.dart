@@ -53,7 +53,7 @@ class ToolRemoteDataSource {
       description: description,
       config: config ?? const {},
       createdAt: DateTime.now(),
-    ));
+    ),);
 
     final response = await _dioClient.post<Map<String, Object?>>(
       AppConfig.toolsEndpoint,

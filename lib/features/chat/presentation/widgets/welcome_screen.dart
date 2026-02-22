@@ -1,17 +1,19 @@
 /// Welcome screen shown when there are no messages.
 ///
 /// Displays the Sanbao compass animation, agent info (if active),
-/// and starter prompt cards to help the user get started.
+/// starter prompt cards, and a quick action for image generation.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sanbao_flutter/core/config/app_config.dart';
 import 'package:sanbao_flutter/core/theme/animations.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/theme/shadows.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_compass.dart';
+import 'package:sanbao_flutter/features/image_gen/presentation/screens/image_gen_screen.dart';
 
 /// Starter prompt definition.
 class _StarterPrompt {
@@ -169,6 +171,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
             // Starter prompts
             ..._buildPromptCards(context),
+
+            // Image generation quick action
+            if (AppConfig.enableImageGeneration) ...[
+              const SizedBox(height: 8),
+              _buildImageGenCard(context),
+            ],
           ],
         ),
       ),
@@ -193,7 +201,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           child: SanbaoCompass(
             size: 32,
             color: Colors.white,
-            state: CompassState.idle,
           ),
         ),
       );
@@ -255,7 +262,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               endFraction.clamp(0.0, 1.0),
               curve: SanbaoAnimations.smoothCurve,
             ),
-          )),
+          ),),
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: GestureDetector(
@@ -327,5 +334,78 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
       );
     });
+  }
+
+  /// Builds the image generation quick action card.
+  ///
+  /// Uses a distinct rose/pink color scheme to visually separate it
+  /// from the text prompt cards.
+  Widget _buildImageGenCard(BuildContext context) {
+    final colors = context.sanbaoColors;
+    const roseColor = Color(0xFFF43F5E);
+    const roseBg = Color(0xFFFFF1F2);
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        showImageGenSheet(context);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: colors.bgSurface,
+          borderRadius: SanbaoRadius.md,
+          border: Border.all(
+            color: roseColor.withValues(alpha: 0.15),
+            width: 0.5,
+          ),
+          boxShadow: SanbaoShadows.sm,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: roseBg,
+                borderRadius: SanbaoRadius.sm,
+              ),
+              child: const Icon(
+                Icons.auto_awesome_rounded,
+                size: 18,
+                color: roseColor,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Генерация изображения',
+                    style: context.textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Создайте изображение по текстовому описанию',
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: colors.textMuted,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: roseColor,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

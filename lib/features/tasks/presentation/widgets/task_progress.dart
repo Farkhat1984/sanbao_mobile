@@ -4,8 +4,6 @@
 /// percentage in the center.
 library;
 
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';

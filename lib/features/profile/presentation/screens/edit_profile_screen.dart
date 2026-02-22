@@ -12,7 +12,6 @@ import 'package:go_router/go_router.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_button.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_input.dart';
-import 'package:sanbao_flutter/features/auth/domain/entities/user.dart';
 import 'package:sanbao_flutter/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sanbao_flutter/features/profile/presentation/providers/profile_provider.dart';
 import 'package:sanbao_flutter/features/profile/presentation/widgets/avatar_picker.dart';
@@ -50,7 +49,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.sanbaoColors;
     final user = ref.watch(currentUserProvider);
     final profileState = ref.watch(profileProvider);
     final isLoading = profileState is ProfileLoading;
@@ -112,7 +110,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           // Save button
           SanbaoButton(
             label: 'Сохранить',
-            variant: SanbaoButtonVariant.primary,
             size: SanbaoButtonSize.large,
             isExpanded: true,
             isLoading: _isSaving,
@@ -173,8 +170,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       if (mounted) {
         if (success) {
-          context.showSuccessSnackBar('Профиль обновлён');
-          context.pop();
+          context
+            ..showSuccessSnackBar('Профиль обновлён')
+            ..pop();
         } else {
           final state = ref.read(profileProvider);
           if (state is ProfileError) {

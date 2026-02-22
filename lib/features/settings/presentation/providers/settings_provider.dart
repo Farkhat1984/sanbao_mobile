@@ -47,9 +47,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 
 /// Provider for the current theme mode.
 final themeModeProvider =
-    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
-  return ThemeModeNotifier();
-});
+    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) => ThemeModeNotifier());
 
 // ---- Biometric Provider ----
 
@@ -72,7 +70,7 @@ class BiometricEnabledNotifier extends StateNotifier<bool> {
   }
 
   /// Sets the biometric lock setting explicitly.
-  Future<void> setEnabled(bool enabled) async {
+  Future<void> setEnabled({required bool enabled}) async {
     state = enabled;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_SettingsKeys.biometricEnabled, enabled);
@@ -81,9 +79,7 @@ class BiometricEnabledNotifier extends StateNotifier<bool> {
 
 /// Provider for the biometric lock setting.
 final biometricEnabledProvider =
-    StateNotifierProvider<BiometricEnabledNotifier, bool>((ref) {
-  return BiometricEnabledNotifier();
-});
+    StateNotifierProvider<BiometricEnabledNotifier, bool>((ref) => BiometricEnabledNotifier());
 
 // ---- Notification Settings Provider ----
 
@@ -165,6 +161,4 @@ class NotificationSettingsNotifier extends StateNotifier<NotificationSettings> {
 /// Provider for notification preferences.
 final notificationSettingsProvider =
     StateNotifierProvider<NotificationSettingsNotifier, NotificationSettings>(
-        (ref) {
-  return NotificationSettingsNotifier();
-});
+        (ref) => NotificationSettingsNotifier(),);

@@ -35,6 +35,7 @@ class _MemoryListScreenState extends ConsumerState<MemoryListScreen> {
     super.dispose();
   }
 
+  // ignore: use_setters_to_change_properties
   void _onSearchChanged(String query) {
     ref.read(memorySearchQueryProvider.notifier).state = query;
   }

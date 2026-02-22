@@ -219,7 +219,7 @@ class _McpFormScreenState extends ConsumerState<McpFormScreen> {
                           final updated = await ref
                               .read(mcpServersProvider.notifier)
                               .testConnection(widget.server!.id);
-                          if (mounted) {
+                          if (context.mounted) {
                             if (updated.status == McpServerStatus.connected) {
                               context.showSuccessSnackBar(
                                 'Подключение успешно',
@@ -232,7 +232,7 @@ class _McpFormScreenState extends ConsumerState<McpFormScreen> {
                             }
                           }
                         } on Object catch (e) {
-                          if (mounted) {
+                          if (context.mounted) {
                             context.showErrorSnackBar('Ошибка: $e');
                           }
                         }

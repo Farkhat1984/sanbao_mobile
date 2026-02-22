@@ -43,7 +43,7 @@ class TaskItem extends StatelessWidget {
         child: Row(
           children: [
             // Progress indicator
-            TaskProgress(task: task, size: 48),
+            TaskProgress(task: task),
             const SizedBox(width: 16),
             // Content
             Expanded(

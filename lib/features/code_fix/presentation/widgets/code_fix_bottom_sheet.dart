@@ -412,7 +412,6 @@ class _CodeFixSheetState extends ConsumerState<_CodeFixSheet> {
               leadingIcon: Icons.refresh_rounded,
               size: SanbaoButtonSize.small,
               variant: SanbaoButtonVariant.ghost,
-              isExpanded: false,
             ),
           ],
         ),

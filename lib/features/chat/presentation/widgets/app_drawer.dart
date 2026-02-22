@@ -40,14 +40,14 @@ final filteredGroupedConversationsProvider =
       final matchingConversations = group.conversations
           .where((c) =>
               c.title.toLowerCase().contains(query) ||
-              (c.lastMessagePreview?.toLowerCase().contains(query) ?? false))
+              (c.lastMessagePreview?.toLowerCase().contains(query) ?? false),)
           .toList();
 
       if (matchingConversations.isNotEmpty) {
         filtered.add(ConversationGroup(
           label: group.label,
           conversations: matchingConversations,
-        ));
+        ),);
       }
     }
     return filtered;
@@ -95,7 +95,7 @@ class AppDrawer extends ConsumerWidget {
     return ClipRRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
+        child: ColoredBox(
           color: colors.sidebarBg,
           child: SafeArea(
             bottom: false,
@@ -481,8 +481,7 @@ class _DrawerLoadingSkeleton extends StatelessWidget {
   const _DrawerLoadingSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
+  Widget build(BuildContext context) => ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       children: [
         // Section header skeleton
@@ -494,7 +493,6 @@ class _DrawerLoadingSkeleton extends StatelessWidget {
         for (var i = 0; i < 6; i++) const SanbaoConversationSkeleton(),
       ],
     );
-  }
 }
 
 // ---- Sealed list item types for type-safe rendering ----

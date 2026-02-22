@@ -7,10 +7,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sanbao_flutter/core/theme/animations.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
-import 'package:sanbao_flutter/core/theme/shadows.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_modal.dart';
 import 'package:sanbao_flutter/features/artifacts/domain/entities/artifact.dart';
@@ -98,7 +96,7 @@ class _VersionSelectorState extends ConsumerState<VersionSelector> {
           .loadVersions(widget.artifact.id);
     }
 
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     await showSanbaoBottomSheet<void>(
       context: context,
@@ -232,8 +230,7 @@ class _VersionTile extends StatelessWidget {
   final VoidCallback? onRestore;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
       decoration: BoxDecoration(
         color: isCurrent ? colors.accentLight : Colors.transparent,
@@ -322,7 +319,6 @@ class _VersionTile extends StatelessWidget {
         ],
       ),
     );
-  }
 
   /// Formats a date for version display.
   String _formatDate(DateTime date) {

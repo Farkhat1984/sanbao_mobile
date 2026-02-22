@@ -182,7 +182,6 @@ class _McpServerCardState extends State<McpServerCard>
           if (server.tools.isNotEmpty)
             SanbaoBadge(
               label: '${server.tools.length} инстр.',
-              variant: SanbaoBadgeVariant.accent,
               icon: Icons.build_outlined,
               size: SanbaoBadgeSize.small,
             ),

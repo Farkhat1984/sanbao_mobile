@@ -169,13 +169,11 @@ class _ArtifactViewBody extends ConsumerWidget {
     ArtifactViewTab tab,
     FullArtifact artifact,
     WidgetRef ref,
-  ) {
-    return switch (tab) {
+  ) => switch (tab) {
       ArtifactViewTab.preview => _buildPreview(artifact),
       ArtifactViewTab.editor => _buildEditor(artifact, ref),
       ArtifactViewTab.source => _buildSource(artifact),
     };
-  }
 
   /// Preview tab: rendered Markdown or code preview.
   Widget _buildPreview(FullArtifact artifact) {
@@ -194,8 +192,7 @@ class _ArtifactViewBody extends ConsumerWidget {
   }
 
   /// Editor tab: Markdown editor with toolbar.
-  Widget _buildEditor(FullArtifact artifact, WidgetRef ref) {
-    return DocumentEditor(
+  Widget _buildEditor(FullArtifact artifact, WidgetRef ref) => DocumentEditor(
       key: const ValueKey('editor'),
       content: artifact.content,
       onContentChanged: (newContent) {
@@ -207,16 +204,13 @@ class _ArtifactViewBody extends ConsumerWidget {
             );
       },
     );
-  }
 
   /// Source tab: raw text/code view.
-  Widget _buildSource(FullArtifact artifact) {
-    return _SourceView(
+  Widget _buildSource(FullArtifact artifact) => _SourceView(
       key: const ValueKey('source'),
       content: artifact.content,
       language: artifact.language,
     );
-  }
 }
 
 /// Header section with title, type badge, version, and action buttons.
@@ -403,22 +397,20 @@ class _ActionIconButton extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return Tooltip(
+  Widget build(BuildContext context) => Tooltip(
       message: tooltip,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           width: 36,
           height: 36,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             borderRadius: SanbaoRadius.sm,
           ),
           child: Icon(icon, size: 18, color: color),
         ),
       ),
     );
-  }
 }
 
 /// Tab bar for switching between Preview, Editor, and Source.
@@ -436,7 +428,7 @@ class _ArtifactTabBar extends ConsumerWidget {
     final colors = context.sanbaoColors;
     final tabs = _availableTabs();
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.bgSurface,
         border: Border(
@@ -486,8 +478,7 @@ class _TabItem extends StatelessWidget {
   final SanbaoColorScheme colors;
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
+  Widget build(BuildContext context) => AnimatedContainer(
       duration: SanbaoAnimations.durationFast,
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
@@ -508,14 +499,12 @@ class _TabItem extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Raw source view with monospaced font.
 class _SourceView extends StatelessWidget {
   const _SourceView({
-    super.key,
-    required this.content,
+    required this.content, super.key,
     this.language,
   });
 
@@ -526,7 +515,7 @@ class _SourceView extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.sanbaoColors;
 
-    return Container(
+    return ColoredBox(
       color: colors.bgSurfaceAlt,
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -534,7 +523,6 @@ class _SourceView extends StatelessWidget {
           content,
           style: SanbaoTypography.codeStyle(
             color: colors.textSecondary,
-            fontSize: 13,
           ).copyWith(
             height: 1.7,
           ),

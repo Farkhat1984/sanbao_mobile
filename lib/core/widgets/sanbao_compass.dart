@@ -117,7 +117,7 @@ class _SanbaoCompassState extends State<SanbaoCompass>
           rotation = _loadingController.value * 2 * math.pi;
         } else if (widget.state == CompassState.thinking) {
           // Wobble: sine wave between -8 and +8 degrees
-          final maxAngle = SanbaoAnimations.thinkingMaxRotation * math.pi / 180;
+          const maxAngle = SanbaoAnimations.thinkingMaxRotation * math.pi / 180;
           rotation = math.sin(_thinkingController.value * 2 * math.pi) *
               maxAngle;
         }
@@ -154,63 +154,62 @@ class _ScalesIconPainter extends CustomPainter {
     final h = size.height;
     final cx = w / 2;
 
-    // Stand/pillar
-    canvas.drawLine(
-      Offset(cx, h * 0.15),
-      Offset(cx, h * 0.85),
-      paint,
-    );
-
-    // Base
-    canvas.drawLine(
-      Offset(cx - w * 0.2, h * 0.85),
-      Offset(cx + w * 0.2, h * 0.85),
-      paint,
-    );
-
-    // Beam (horizontal bar)
-    canvas.drawLine(
-      Offset(w * 0.1, h * 0.25),
-      Offset(w * 0.9, h * 0.25),
-      paint,
-    );
+    // Stand/pillar, Base, Beam, pivot, pan strings, pans
+    canvas
+      ..drawLine(
+        Offset(cx, h * 0.15),
+        Offset(cx, h * 0.85),
+        paint,
+      )
+      // Base
+      ..drawLine(
+        Offset(cx - w * 0.2, h * 0.85),
+        Offset(cx + w * 0.2, h * 0.85),
+        paint,
+      )
+      // Beam (horizontal bar)
+      ..drawLine(
+        Offset(w * 0.1, h * 0.25),
+        Offset(w * 0.9, h * 0.25),
+        paint,
+      );
 
     // Top triangle/pivot
     final pivotPath = Path()
       ..moveTo(cx - w * 0.06, h * 0.2)
       ..lineTo(cx, h * 0.12)
       ..lineTo(cx + w * 0.06, h * 0.2);
-    canvas.drawPath(pivotPath, paint);
-
-    // Left pan strings
-    canvas.drawLine(
-      Offset(w * 0.15, h * 0.25),
-      Offset(w * 0.1, h * 0.5),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(w * 0.15, h * 0.25),
-      Offset(w * 0.3, h * 0.5),
-      paint,
-    );
+    canvas
+      ..drawPath(pivotPath, paint)
+      // Left pan strings
+      ..drawLine(
+        Offset(w * 0.15, h * 0.25),
+        Offset(w * 0.1, h * 0.5),
+        paint,
+      )
+      ..drawLine(
+        Offset(w * 0.15, h * 0.25),
+        Offset(w * 0.3, h * 0.5),
+        paint,
+      );
 
     // Left pan (arc)
     final leftPan = Path()
       ..moveTo(w * 0.05, h * 0.5)
       ..quadraticBezierTo(w * 0.2, h * 0.6, w * 0.35, h * 0.5);
-    canvas.drawPath(leftPan, paint);
-
-    // Right pan strings
-    canvas.drawLine(
-      Offset(w * 0.85, h * 0.25),
-      Offset(w * 0.7, h * 0.5),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(w * 0.85, h * 0.25),
-      Offset(w * 0.9, h * 0.5),
-      paint,
-    );
+    canvas
+      ..drawPath(leftPan, paint)
+      // Right pan strings
+      ..drawLine(
+        Offset(w * 0.85, h * 0.25),
+        Offset(w * 0.7, h * 0.5),
+        paint,
+      )
+      ..drawLine(
+        Offset(w * 0.85, h * 0.25),
+        Offset(w * 0.9, h * 0.5),
+        paint,
+      );
 
     // Right pan (arc)
     final rightPan = Path()

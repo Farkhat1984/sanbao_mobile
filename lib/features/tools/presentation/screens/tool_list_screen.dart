@@ -49,8 +49,9 @@ class _ToolListScreenState extends ConsumerState<ToolListScreen>
 
   @override
   void dispose() {
-    _tabController.removeListener(_onTabChanged);
-    _tabController.dispose();
+    _tabController
+      ..removeListener(_onTabChanged)
+      ..dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -62,6 +63,7 @@ class _ToolListScreenState extends ConsumerState<ToolListScreen>
     }
   }
 
+  // ignore: use_setters_to_change_properties
   void _onSearchChanged(String query) {
     ref.read(toolsSearchQueryProvider.notifier).state = query;
   }

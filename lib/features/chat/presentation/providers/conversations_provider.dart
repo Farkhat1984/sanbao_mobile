@@ -7,7 +7,6 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/features/chat/data/repositories/conversation_repository_impl.dart';
 import 'package:sanbao_flutter/features/chat/domain/entities/conversation.dart';
-import 'package:sanbao_flutter/features/chat/domain/repositories/conversation_repository.dart';
 import 'package:sanbao_flutter/features/chat/domain/usecases/load_conversations_usecase.dart';
 
 // ---- Use Case Provider ----

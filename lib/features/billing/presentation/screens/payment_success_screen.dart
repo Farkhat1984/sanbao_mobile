@@ -7,9 +7,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sanbao_flutter/core/theme/animations.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
-import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_button.dart';
 import 'package:sanbao_flutter/features/billing/presentation/providers/billing_provider.dart';
@@ -141,7 +139,6 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen>
                       const SizedBox(height: 40),
                       SanbaoButton(
                         label: 'Перейти к подписке',
-                        variant: SanbaoButtonVariant.primary,
                         size: SanbaoButtonSize.large,
                         isExpanded: true,
                         leadingIcon: Icons.arrow_forward_rounded,

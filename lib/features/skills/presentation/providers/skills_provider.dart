@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/features/skills/data/datasources/skill_remote_datasource.dart';
 import 'package:sanbao_flutter/features/skills/data/repositories/skill_repository_impl.dart';
 import 'package:sanbao_flutter/features/skills/domain/entities/skill.dart';
-import 'package:sanbao_flutter/features/skills/domain/repositories/skill_repository.dart';
 
 // ---- Skills List (Personal) ----
 
@@ -175,7 +174,7 @@ final filteredSkillsProvider = Provider<AsyncValue<List<Skill>>>((ref) {
             query.isEmpty ||
             s.name.toLowerCase().contains(query) ||
             (s.description?.toLowerCase().contains(query) ?? false) ||
-            (s.jurisdiction?.toLowerCase().contains(query) ?? false))
+            (s.jurisdiction?.toLowerCase().contains(query) ?? false),)
         .toList(),
   );
 });
@@ -191,7 +190,7 @@ final filteredPublicSkillsProvider = Provider<AsyncValue<List<Skill>>>((ref) {
             query.isEmpty ||
             s.name.toLowerCase().contains(query) ||
             (s.description?.toLowerCase().contains(query) ?? false) ||
-            (s.jurisdiction?.toLowerCase().contains(query) ?? false))
+            (s.jurisdiction?.toLowerCase().contains(query) ?? false),)
         .toList(),
   );
 });

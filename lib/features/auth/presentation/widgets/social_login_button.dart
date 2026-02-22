@@ -182,13 +182,11 @@ class _ProviderStyle {
 /// Custom Google "G" icon rendered with branded colors.
 class _GoogleIcon extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
+  Widget build(BuildContext context) => SizedBox(
       width: 22,
       height: 22,
       child: CustomPaint(painter: _GoogleLogoPainter()),
     );
-  }
 }
 
 /// Apple logo icon (white on dark background).
@@ -196,15 +194,13 @@ class _AppleIcon extends StatelessWidget {
   const _AppleIcon();
 
   @override
-  Widget build(BuildContext context) {
-    return const SizedBox(
+  Widget build(BuildContext context) => const SizedBox(
       width: 20,
       height: 20,
       child: Center(
         child: Icon(Icons.apple, size: 22, color: Colors.white),
       ),
     );
-  }
 }
 
 /// WhatsApp phone icon (white on green background).
@@ -212,13 +208,11 @@ class _WhatsAppIcon extends StatelessWidget {
   const _WhatsAppIcon();
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
+  Widget build(BuildContext context) => SizedBox(
       width: 20,
       height: 20,
       child: CustomPaint(painter: _WhatsAppLogoPainter()),
     );
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -232,23 +226,23 @@ class _WhatsAppIcon extends StatelessWidget {
 class _GoogleLogoPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final double w = size.width;
-    final double h = size.height;
-    final double cx = w / 2;
-    final double cy = h / 2;
-    const double strokeWidth = 3.0;
+    final w = size.width;
+    final h = size.height;
+    final cx = w / 2;
+    final cy = h / 2;
+    const strokeWidth = 3.0;
     // Inset radius so the stroke stays inside bounds
-    final double r = (w - strokeWidth) / 2;
+    final r = (w - strokeWidth) / 2;
 
     final rect = Rect.fromCircle(center: Offset(cx, cy), radius: r);
 
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.butt;
+      ..strokeCap = StrokeCap.butt
+      ..color = const Color(0xFF4285F4);
 
     // Blue (right, from ~-45° sweeping ~70°)
-    paint.color = const Color(0xFF4285F4);
     canvas.drawArc(rect, -0.75, 1.15, false, paint);
 
     // Green (bottom-right, ~20° sweeping ~70°)
@@ -283,8 +277,8 @@ class _GoogleLogoPainter extends CustomPainter {
 class _WhatsAppLogoPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final double w = size.width;
-    final double h = size.height;
+    final w = size.width;
+    final h = size.height;
 
     final paint = Paint()
       ..color = Colors.white
@@ -313,34 +307,36 @@ class _WhatsAppLogoPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     // Receiver: curved line from bottom-left to top-right
-    final phonePath = Path();
     final pcx = w / 2;
     final pcy = h / 2 - 0.5;
     final pr = w * 0.18;
 
     // Draw a phone handset shape (rotated slightly)
-    // Left earpiece
-    phonePath.moveTo(pcx - pr * 0.9, pcy + pr * 0.5);
-    phonePath.quadraticBezierTo(
-      pcx - pr * 1.0, pcy - pr * 0.2,
-      pcx - pr * 0.5, pcy - pr * 0.8,
-    );
-    // Curved body connecting earpieces
-    phonePath.quadraticBezierTo(
-      pcx, pcy - pr * 0.3,
-      pcx + pr * 0.5, pcy - pr * 0.8,
-    );
-    // Right earpiece
-    phonePath.quadraticBezierTo(
-      pcx + pr * 1.0, pcy - pr * 0.2,
-      pcx + pr * 0.9, pcy + pr * 0.5,
-    );
+    final phonePath = Path()
+      // Left earpiece
+      ..moveTo(pcx - pr * 0.9, pcy + pr * 0.5)
+      ..quadraticBezierTo(
+        pcx - pr * 1.0, pcy - pr * 0.2,
+        pcx - pr * 0.5, pcy - pr * 0.8,
+      )
+      // Curved body connecting earpieces
+      ..quadraticBezierTo(
+        pcx, pcy - pr * 0.3,
+        pcx + pr * 0.5, pcy - pr * 0.8,
+      )
+      // Right earpiece
+      ..quadraticBezierTo(
+        pcx + pr * 1.0, pcy - pr * 0.2,
+        pcx + pr * 0.9, pcy + pr * 0.5,
+      );
 
     // Rotate the phone path 135 degrees for the WhatsApp style angle
     final rotatedPath = phonePath.transform(
       (Matrix4.identity()
+            // ignore: deprecated_member_use
             ..translate(pcx, pcy)
             ..rotateZ(math.pi * 0.75)
+            // ignore: deprecated_member_use
             ..translate(-pcx, -pcy))
           .storage,
     );

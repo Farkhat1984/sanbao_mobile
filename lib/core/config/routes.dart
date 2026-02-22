@@ -13,6 +13,7 @@
 /// - /profile
 /// - /profile/edit
 /// - /settings
+/// - /settings/2fa (2FA setup wizard)
 /// - /agents
 /// - /agents/new
 /// - /agents/:id
@@ -32,6 +33,8 @@
 /// - /mcp-servers/:id/edit
 /// - /memory
 /// - /tasks
+/// - /knowledge
+/// - /knowledge/:id
 /// - /billing
 /// - /billing/plans
 /// - /billing/success
@@ -49,11 +52,15 @@ import 'package:sanbao_flutter/features/artifacts/presentation/screens/artifact_
 import 'package:sanbao_flutter/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sanbao_flutter/features/auth/presentation/screens/login_screen.dart';
 import 'package:sanbao_flutter/features/auth/presentation/screens/register_screen.dart';
+import 'package:sanbao_flutter/features/auth/presentation/screens/two_factor_setup_screen.dart';
 import 'package:sanbao_flutter/features/billing/presentation/screens/billing_screen.dart';
 import 'package:sanbao_flutter/features/billing/presentation/screens/payment_success_screen.dart';
 import 'package:sanbao_flutter/features/billing/presentation/screens/plans_screen.dart';
 import 'package:sanbao_flutter/features/chat/presentation/screens/chat_screen.dart';
 import 'package:sanbao_flutter/features/chat/presentation/screens/main_layout.dart';
+import 'package:sanbao_flutter/features/image_gen/presentation/screens/image_gen_full_screen.dart';
+import 'package:sanbao_flutter/features/knowledge/presentation/screens/knowledge_detail_screen.dart';
+import 'package:sanbao_flutter/features/knowledge/presentation/screens/knowledge_list_screen.dart';
 import 'package:sanbao_flutter/features/mcp/domain/entities/mcp_server.dart';
 import 'package:sanbao_flutter/features/mcp/presentation/screens/mcp_form_screen.dart';
 import 'package:sanbao_flutter/features/mcp/presentation/screens/mcp_list_screen.dart';
@@ -84,6 +91,7 @@ abstract final class RoutePaths {
   static const String profile = '/profile';
   static const String editProfile = '/profile/edit';
   static const String settings = '/settings';
+  static const String twoFactorSetup = '/settings/2fa';
   static const String agents = '/agents';
   static const String agentNew = '/agents/new';
   static const String agentDetail = '/agents/:id';
@@ -106,6 +114,9 @@ abstract final class RoutePaths {
   static const String pluginNew = '/plugins/new';
   static const String memory = '/memory';
   static const String tasks = '/tasks';
+  static const String knowledge = '/knowledge';
+  static const String knowledgeDetail = '/knowledge/:id';
+  static const String imageGen = '/image-gen';
 }
 
 /// Named routes for programmatic navigation.
@@ -119,6 +130,7 @@ abstract final class RouteNames {
   static const String profile = 'profile';
   static const String editProfile = 'editProfile';
   static const String settings = 'settings';
+  static const String twoFactorSetup = 'twoFactorSetup';
   static const String agents = 'agents';
   static const String agentNew = 'agentNew';
   static const String agentDetail = 'agentDetail';
@@ -141,6 +153,9 @@ abstract final class RouteNames {
   static const String pluginNew = 'pluginNew';
   static const String memory = 'memory';
   static const String tasks = 'tasks';
+  static const String knowledge = 'knowledge';
+  static const String knowledgeDetail = 'knowledgeDetail';
+  static const String imageGen = 'imageGen';
 }
 
 /// Creates the application router with auth guard, onboarding guard,
@@ -163,7 +178,7 @@ GoRouter createRouter({
     GoRouter(
       initialLocation: initialLocation ?? RoutePaths.splash,
       debugLogDiagnostics: true,
-      redirect: (BuildContext context, GoRouterState state) {
+      redirect: (context, state) {
         final loading = isAuthLoading();
         final loggedIn = isAuthenticated();
         final onboarded = isOnboardingCompleted();
@@ -277,6 +292,14 @@ GoRouter createRouter({
           path: RoutePaths.settings,
           name: RouteNames.settings,
           builder: (context, state) => const SettingsScreen(),
+          routes: [
+            // 2FA setup wizard
+            GoRoute(
+              path: '2fa',
+              name: RouteNames.twoFactorSetup,
+              builder: (context, state) => const TwoFactorSetupScreen(),
+            ),
+          ],
         ),
 
         // Agents routes
@@ -430,6 +453,30 @@ GoRouter createRouter({
           builder: (context, state) => const TaskListScreen(),
         ),
 
+        // Knowledge base (user files)
+        GoRoute(
+          path: RoutePaths.knowledge,
+          name: RouteNames.knowledge,
+          builder: (context, state) => const KnowledgeListScreen(),
+          routes: [
+            GoRoute(
+              path: ':id',
+              name: RouteNames.knowledgeDetail,
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return KnowledgeDetailScreen(fileId: id);
+              },
+            ),
+          ],
+        ),
+
+        // Image generation
+        GoRoute(
+          path: RoutePaths.imageGen,
+          name: RouteNames.imageGen,
+          builder: (context, state) => const ImageGenFullScreen(),
+        ),
+
         // Billing routes
         GoRoute(
           path: RoutePaths.billing,
@@ -497,8 +544,7 @@ class _SplashScreen extends StatelessWidget {
   const _SplashScreen();
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -537,7 +583,6 @@ class _SplashScreen extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Provider that supplies the GoRouter instance.

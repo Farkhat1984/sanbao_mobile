@@ -210,7 +210,7 @@ class _ThinkingIndicatorState extends State<ThinkingIndicator>
       ).animate(CurvedAnimation(
         parent: _slideController,
         curve: SanbaoAnimations.smoothCurve,
-      )),
+      ),),
       child: FadeTransition(
         opacity: _slideController,
         child: Padding(
@@ -298,8 +298,7 @@ class _PulsingDotsState extends State<_PulsingDots>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: _controller,
       builder: (context, _) => Row(
         mainAxisSize: MainAxisSize.min,
@@ -329,7 +328,6 @@ class _PulsingDotsState extends State<_PulsingDots>
         }),
       ),
     );
-  }
 
   /// Simple bounce function for dot animation.
   double _bounce(double t) {

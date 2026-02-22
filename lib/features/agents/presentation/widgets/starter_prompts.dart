@@ -40,8 +40,7 @@ class StarterPrompts extends StatelessWidget {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: displayPrompts.map((prompt) {
-        return GestureDetector(
+      children: displayPrompts.map((prompt) => GestureDetector(
           onTap: onPromptTap != null ? () => onPromptTap!(prompt) : null,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -72,8 +71,7 @@ class StarterPrompts extends StatelessWidget {
               ],
             ),
           ),
-        );
-      }).toList(),
+        ),).toList(),
     );
   }
 }
@@ -153,15 +151,13 @@ class _StarterPromptsEditorState extends State<StarterPromptsEditor> {
         ),
         const SizedBox(height: 8),
         // Existing prompts
-        ...widget.prompts.asMap().entries.map((entry) {
-          return Padding(
+        ...widget.prompts.asMap().entries.map((entry) => Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: _PromptItem(
               prompt: entry.value,
               onRemove: () => widget.onRemove(entry.key),
             ),
-          );
-        }),
+          ),),
         // Add new prompt field
         if (canAdd) ...[
           const SizedBox(height: 4),

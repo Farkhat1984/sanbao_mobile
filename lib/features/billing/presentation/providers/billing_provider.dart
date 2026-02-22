@@ -240,6 +240,98 @@ final paymentHistoryProvider =
   return PaymentHistoryNotifier(repository: repository);
 });
 
+// ---- Promo Code Provider ----
+
+/// Sealed state for promo code validation.
+sealed class PromoCodeState {
+  const PromoCodeState();
+}
+
+/// Initial state -- no promo code entered.
+final class PromoCodeInitial extends PromoCodeState {
+  const PromoCodeInitial();
+}
+
+/// Promo code is being validated.
+final class PromoCodeValidating extends PromoCodeState {
+  const PromoCodeValidating();
+}
+
+/// Promo code validated successfully.
+final class PromoCodeApplied extends PromoCodeState {
+  const PromoCodeApplied({required this.discount, required this.message});
+
+  /// Discount percentage (0-100).
+  final int discount;
+
+  /// Server-provided success message.
+  final String message;
+}
+
+/// Promo code validation failed.
+final class PromoCodeInvalid extends PromoCodeState {
+  const PromoCodeInvalid({required this.message});
+
+  /// Server-provided error message.
+  final String message;
+}
+
+/// Promo code request failed due to a network or server error.
+final class PromoCodeError extends PromoCodeState {
+  const PromoCodeError({required this.message});
+  final String message;
+}
+
+/// Notifier that manages promo code validation state.
+class PromoCodeNotifier extends StateNotifier<PromoCodeState> {
+  PromoCodeNotifier({required BillingRepository repository})
+      : _repository = repository,
+        super(const PromoCodeInitial());
+
+  final BillingRepository _repository;
+
+  /// Validates and applies a promotional code.
+  Future<void> applyPromoCode(String code) async {
+    if (code.trim().isEmpty) return;
+
+    state = const PromoCodeValidating();
+    try {
+      final result = await _repository.applyPromoCode(code.trim());
+      if (result.valid) {
+        state = PromoCodeApplied(
+          discount: result.discount,
+          message: result.message,
+        );
+      } else {
+        state = PromoCodeInvalid(
+          message: result.message.isNotEmpty
+              ? result.message
+              : 'Недействительный промокод',
+        );
+      }
+    } on Failure catch (f) {
+      state = PromoCodeError(message: f.message);
+    } catch (e) {
+      debugPrint('[PromoCodeNotifier] Error applying promo: $e');
+      state = const PromoCodeError(
+        message: 'Не удалось проверить промокод',
+      );
+    }
+  }
+
+  /// Resets the promo code state to initial.
+  void reset() {
+    state = const PromoCodeInitial();
+  }
+}
+
+/// Provider for promo code validation state.
+final promoCodeProvider =
+    StateNotifierProvider<PromoCodeNotifier, PromoCodeState>((ref) {
+  final repository = ref.watch(billingRepositoryProvider);
+  return PromoCodeNotifier(repository: repository);
+});
+
 // ---- Checkout Provider ----
 
 /// Provider for creating checkout sessions.

@@ -115,8 +115,8 @@ class MarkdownEditorState extends State<MarkdownEditor> {
   static final RegExp _bulletPattern = RegExp(r'^(\s*)[-*+]\s');
   static final RegExp _numberedPattern = RegExp(r'^(\s*)(\d+)\.\s');
   static final RegExp _headingPattern = RegExp(r'^(#{1,6})\s');
-  static final RegExp _blockquotePattern = RegExp('^>\\s?');
-  static final RegExp _codeBlockFencePattern = RegExp(r'^```');
+  static final RegExp _blockquotePattern = RegExp(r'^>\s?');
+  static final RegExp _codeBlockFencePattern = RegExp('^```');
 
   ScrollController? _scrollController;
 
@@ -702,8 +702,7 @@ class _LineNumberGutter extends StatelessWidget {
       padding: const EdgeInsets.only(top: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
-        children: List.generate(lineCount, (index) {
-          return SizedBox(
+        children: List.generate(lineCount, (index) => SizedBox(
             // Match the line height: 14px font * 1.7 height = 23.8
             height: 14 * 1.7,
             child: Padding(
@@ -717,8 +716,7 @@ class _LineNumberGutter extends StatelessWidget {
                 ),
               ),
             ),
-          );
-        }),
+          ),),
       ),
     );
   }

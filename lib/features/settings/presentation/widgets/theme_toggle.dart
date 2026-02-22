@@ -84,11 +84,11 @@ class ThemeToggle extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: colors.bgSurface,
                     borderRadius: SanbaoRadius.sm,
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
-                        color: const Color(0x0A1A2138),
+                        color: Color(0x0A1A2138),
                         blurRadius: 4,
-                        offset: const Offset(0, 1),
+                        offset: Offset(0, 1),
                       ),
                     ],
                   ),

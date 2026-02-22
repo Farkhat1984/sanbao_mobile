@@ -4,15 +4,13 @@
 /// repositories, providers, screens, and widgets.
 library;
 
-// Domain
-export 'domain/entities/agent.dart';
-export 'domain/repositories/agent_repository.dart';
-
 // Data
 export 'data/datasources/agent_remote_datasource.dart';
 export 'data/models/agent_model.dart';
 export 'data/repositories/agent_repository_impl.dart';
-
+// Domain
+export 'domain/entities/agent.dart';
+export 'domain/repositories/agent_repository.dart';
 // Presentation
 export 'presentation/providers/agents_provider.dart';
 export 'presentation/screens/agent_detail_screen.dart';

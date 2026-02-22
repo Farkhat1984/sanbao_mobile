@@ -104,10 +104,9 @@ abstract final class ArtifactContentParser {
             label: 'Оригинал',
           ),
         ],
-        currentVersion: 1,
         createdAt: now,
         updatedAt: now,
-      ));
+      ),);
 
       index++;
     }
@@ -145,10 +144,9 @@ abstract final class ArtifactContentParser {
               label: 'Оригинал',
             ),
           ],
-          currentVersion: 1,
           createdAt: now,
           updatedAt: now,
-        ));
+        ),);
 
         index++;
       }

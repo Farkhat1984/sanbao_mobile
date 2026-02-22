@@ -4,12 +4,10 @@
 /// and CRUD form state for agents.
 library;
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/features/agents/data/datasources/agent_remote_datasource.dart';
 import 'package:sanbao_flutter/features/agents/data/repositories/agent_repository_impl.dart';
 import 'package:sanbao_flutter/features/agents/domain/entities/agent.dart';
-import 'package:sanbao_flutter/features/agents/domain/repositories/agent_repository.dart';
 
 // ---- Agents List ----
 
@@ -149,7 +147,7 @@ final systemAgentsProvider = Provider<AsyncValue<List<Agent>>>((ref) {
         .where((a) =>
             query.isEmpty ||
             a.name.toLowerCase().contains(query) ||
-            (a.description?.toLowerCase().contains(query) ?? false))
+            (a.description?.toLowerCase().contains(query) ?? false),)
         .toList(),
   );
 });
@@ -165,7 +163,7 @@ final userAgentsProvider = Provider<AsyncValue<List<Agent>>>((ref) {
         .where((a) =>
             query.isEmpty ||
             a.name.toLowerCase().contains(query) ||
-            (a.description?.toLowerCase().contains(query) ?? false))
+            (a.description?.toLowerCase().contains(query) ?? false),)
         .toList(),
   );
 });

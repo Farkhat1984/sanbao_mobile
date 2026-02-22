@@ -11,15 +11,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/core/theme/animations.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_compass.dart';
+import 'package:sanbao_flutter/features/chat/data/models/chat_event_model.dart';
 import 'package:sanbao_flutter/features/chat/domain/entities/chat_event.dart';
 import 'package:sanbao_flutter/features/chat/domain/entities/message.dart';
 import 'package:sanbao_flutter/features/chat/presentation/providers/chat_provider.dart';
 import 'package:sanbao_flutter/features/chat/presentation/providers/file_provider.dart';
 import 'package:sanbao_flutter/features/chat/presentation/screens/main_layout.dart';
+import 'package:sanbao_flutter/features/chat/presentation/widgets/clarify_bottom_sheet.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/message_input.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/thinking_indicator.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/welcome_screen.dart';
+import 'package:sanbao_flutter/features/legal/presentation/widgets/legal_article_sheet.dart';
 import 'package:sanbao_flutter/features/notifications/presentation/widgets/notification_bell.dart';
 
 /// The main chat screen displaying messages and input.
@@ -83,6 +86,28 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
+  /// Shows the clarification questions bottom sheet.
+  Future<void> _showClarifyQuestions(List<ClarifyQuestion> questions) async {
+    // Clear the provider first to prevent re-triggering
+    ref.read(clarifyQuestionsProvider.notifier).state = null;
+
+    final answer = await showClarifySheet(context, questions);
+    if (answer != null && answer.isNotEmpty) {
+      ref.read(pendingInputProvider.notifier).state = answer;
+    }
+  }
+
+  /// Handles regenerate: finds the user message before the given assistant
+  /// message index and sets it as pending input.
+  void _handleRegenerate(List<Message> messages, int assistantIndex) {
+    for (var i = assistantIndex - 1; i >= 0; i--) {
+      if (messages[i].isUser && messages[i].content.trim().isNotEmpty) {
+        ref.read(pendingInputProvider.notifier).state = messages[i].content;
+        break;
+      }
+    }
+  }
+
   void _handleSendMessage(String content) {
     _shouldAutoScroll = true;
     _userHasScrolledUp = false;
@@ -121,6 +146,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final streamingPhase = ref.watch(streamingPhaseProvider);
     final toolName = ref.watch(streamingToolNameProvider);
     final colors = context.sanbaoColors;
+
+    // Listen for clarification questions from AI
+    ref.listen(clarifyQuestionsProvider, (previous, next) {
+      if (next != null && next.isNotEmpty && mounted) {
+        _showClarifyQuestions(next);
+      }
+    });
 
     // Auto-scroll when streaming and user hasn't scrolled up
     if (isStreaming && _shouldAutoScroll) {
@@ -231,8 +263,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     bool isStreaming,
     StreamingPhase? streamingPhase,
     String? toolName,
-  ) {
-    return ListView.builder(
+  ) => ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       itemCount: messages.length + (isStreaming && streamingPhase != null ? 1 : 0),
@@ -265,12 +296,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           showTimestamp: _shouldShowTimestamp(messages, index),
           animate: index >= messages.length - 2,
           onArtifactOpen: (artifactId) {
-            // TODO: Open artifact viewer
+            // TODO(dev): Open artifact viewer
             context.showSnackBar('Просмотр артефакта');
           },
           onLegalReferenceTap: (codeName, article) {
-            // TODO: Open legal reference
-            context.showSnackBar('ст. $article');
+            showLegalArticleSheet(
+              context,
+              codeName: codeName,
+              articleNum: article,
+            );
           },
           onRetry: message.isError
               ? () {
@@ -283,10 +317,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   }
                 }
               : null,
+          onRegenerate: message.isAssistant && !message.isError
+              ? () => _handleRegenerate(messages, index)
+              : null,
         );
       },
     );
-  }
 
   /// Determines whether to show a timestamp for a message.
   ///

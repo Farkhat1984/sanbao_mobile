@@ -6,7 +6,6 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/features/memory/data/repositories/memory_repository_impl.dart';
 import 'package:sanbao_flutter/features/memory/domain/entities/memory.dart';
-import 'package:sanbao_flutter/features/memory/domain/repositories/memory_repository.dart';
 
 // ---- Memory List ----
 
@@ -101,9 +100,9 @@ final filteredMemoriesProvider =
   return memories.whenData(
     (list) => list
         .where((m) =>
-            categoryFilter == null || m.category == categoryFilter)
+            categoryFilter == null || m.category == categoryFilter,)
         .where((m) =>
-            query.isEmpty || m.content.toLowerCase().contains(query))
+            query.isEmpty || m.content.toLowerCase().contains(query),)
         .toList(),
   );
 });

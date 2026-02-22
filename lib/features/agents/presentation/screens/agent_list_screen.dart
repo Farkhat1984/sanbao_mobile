@@ -40,6 +40,7 @@ class _AgentListScreenState extends ConsumerState<AgentListScreen> {
     super.dispose();
   }
 
+  // ignore: use_setters_to_change_properties
   void _onSearchChanged(String query) {
     ref.read(agentsSearchQueryProvider.notifier).state = query;
   }
@@ -239,8 +240,7 @@ class _UserAgentsSection extends ConsumerWidget {
     return userAgents.when(
       loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
       error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
-      data: (agents) {
-        return SliverPadding(
+      data: (agents) => SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           sliver: SliverMainAxisGroup(
             slivers: [
@@ -251,7 +251,7 @@ class _UserAgentsSection extends ConsumerWidget {
                 ),
               ),
               if (agents.isEmpty)
-                SliverToBoxAdapter(
+                const SliverToBoxAdapter(
                   child: EmptyState(
                     icon: Icons.smart_toy_outlined,
                     title: 'Нет пользовательских агентов',
@@ -278,8 +278,7 @@ class _UserAgentsSection extends ConsumerWidget {
                 ),
             ],
           ),
-        );
-      },
+        ),
     );
   }
 }

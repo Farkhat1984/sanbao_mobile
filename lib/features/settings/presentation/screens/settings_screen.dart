@@ -1,15 +1,18 @@
 /// Settings screen.
 ///
 /// Contains theme toggle (System/Light/Dark), biometric lock toggle,
-/// notification toggles, language selector, about section, logout,
-/// and account deletion (with confirmation dialog).
+/// 2FA toggle, notification toggles, language selector, about section,
+/// logout, and account deletion (with confirmation dialog).
 library;
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:sanbao_flutter/core/config/app_config.dart';
+import 'package:sanbao_flutter/core/config/routes.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
@@ -17,6 +20,8 @@ import 'package:sanbao_flutter/core/widgets/sanbao_button.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_card.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_modal.dart';
 import 'package:sanbao_flutter/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sanbao_flutter/features/auth/presentation/providers/two_factor_provider.dart';
+import 'package:sanbao_flutter/features/auth/presentation/widgets/two_factor_disable_dialog.dart';
 import 'package:sanbao_flutter/features/profile/presentation/providers/profile_provider.dart';
 import 'package:sanbao_flutter/features/profile/presentation/widgets/locale_selector.dart';
 import 'package:sanbao_flutter/features/settings/presentation/providers/settings_provider.dart';
@@ -28,8 +33,7 @@ class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
       appBar: AppBar(
         title: const Text('Настройки'),
         leading: IconButton(
@@ -44,6 +48,8 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           _SecuritySection(),
           const SizedBox(height: 16),
+          _DataSection(),
+          const SizedBox(height: 16),
           const NotificationSettingsCard(),
           const SizedBox(height: 16),
           _LanguageSection(),
@@ -55,7 +61,6 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
 }
 
 // ---- Appearance Section ----
@@ -104,6 +109,7 @@ class _SecuritySection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.sanbaoColors;
     final biometricEnabled = ref.watch(biometricEnabledProvider);
+    final is2faEnabled = ref.watch(isTwoFactorEnabledProvider);
 
     return SanbaoCard(
       child: Column(
@@ -117,6 +123,8 @@ class _SecuritySection extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
+
+          // Biometric lock row
           Row(
             children: [
               Container(
@@ -164,6 +172,20 @@ class _SecuritySection extends ConsumerWidget {
               ),
             ],
           ),
+
+          // Divider between security settings
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Divider(
+              height: 1,
+              color: colors.border,
+            ),
+          ),
+
+          // 2FA row
+          _TwoFactorRow(
+            isEnabled: is2faEnabled,
+          ),
         ],
       ),
     );
@@ -195,11 +217,236 @@ class _SecuritySection extends ConsumerWidget {
       );
 
       if (didAuthenticate) {
-        ref.read(biometricEnabledProvider.notifier).setEnabled(true);
+        unawaited(ref.read(biometricEnabledProvider.notifier).setEnabled(enabled: true));
       }
     } else {
-      ref.read(biometricEnabledProvider.notifier).setEnabled(false);
+      unawaited(ref.read(biometricEnabledProvider.notifier).setEnabled(enabled: false));
     }
+  }
+}
+
+// ---- Two-Factor Authentication Row ----
+
+/// Row showing 2FA status with enable/disable action.
+class _TwoFactorRow extends ConsumerWidget {
+  const _TwoFactorRow({required this.isEnabled});
+
+  final bool isEnabled;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.sanbaoColors;
+
+    return GestureDetector(
+      onTap: () => _handleTap(context, ref),
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isEnabled
+                  ? colors.accentLight
+                  : colors.bgSurfaceAlt,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.shield_rounded,
+              size: 20,
+              color: isEnabled
+                  ? colors.accent
+                  : colors.textMuted,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Двухфакторная аутентификация',
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isEnabled ? 'Включена' : 'Отключена',
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: isEnabled ? colors.success : colors.textMuted,
+                    fontWeight: isEnabled ? FontWeight.w500 : FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isEnabled)
+            // Disable button
+            SanbaoButton(
+              label: 'Выключить',
+              variant: SanbaoButtonVariant.ghost,
+              size: SanbaoButtonSize.small,
+              onPressed: () => _handleDisable(context),
+            )
+          else
+            // Enable button
+            SanbaoButton(
+              label: 'Настроить',
+              variant: SanbaoButtonVariant.ghost,
+              size: SanbaoButtonSize.small,
+              onPressed: () => _navigateToSetup(context),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _handleTap(BuildContext context, WidgetRef ref) {
+    if (isEnabled) {
+      _handleDisable(context);
+    } else {
+      _navigateToSetup(context);
+    }
+  }
+
+  void _navigateToSetup(BuildContext context) {
+    context.push(RoutePaths.twoFactorSetup);
+  }
+
+  Future<void> _handleDisable(BuildContext context) async {
+    final disabled = await showDisableTwoFactorDialog(context: context);
+    if (disabled && context.mounted) {
+      context.showSuccessSnackBar('Двухфакторная аутентификация отключена');
+    }
+  }
+}
+
+// ---- Data Section ----
+
+class _DataSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.sanbaoColors;
+
+    return SanbaoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Данные',
+            style: context.textTheme.titleSmall?.copyWith(
+              color: colors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Knowledge base row
+          GestureDetector(
+            onTap: () => context.push(RoutePaths.knowledge),
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colors.accentLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.folder_outlined,
+                    size: 20,
+                    color: colors.accent,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'База знаний',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: colors.textPrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Ваши файлы и документы',
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: colors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: colors.textMuted,
+                ),
+              ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Divider(height: 1, color: colors.border),
+          ),
+
+          // Memory row
+          GestureDetector(
+            onTap: () => context.push(RoutePaths.memory),
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colors.bgSurfaceAlt,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.psychology_outlined,
+                    size: 20,
+                    color: colors.textMuted,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Память AI',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: colors.textPrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Что AI помнит о вас',
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: colors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: colors.textMuted,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -255,12 +502,12 @@ class _AboutSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _AboutRow(
+          const _AboutRow(
             label: 'Версия',
             value: '${AppConfig.appVersion} (${AppConfig.buildNumber})',
           ),
           const SizedBox(height: 8),
-          _AboutRow(
+          const _AboutRow(
             label: 'Описание',
             value: AppConfig.appDescription,
           ),
@@ -426,7 +673,6 @@ class _DangerSection extends ConsumerWidget {
           'включая разговоры, файлы и настройки, будут '
           'безвозвратно удалены.',
       confirmLabel: 'Продолжить',
-      cancelLabel: 'Отмена',
       isDestructive: true,
     );
 
@@ -439,7 +685,6 @@ class _DangerSection extends ConsumerWidget {
       message: 'Это последнее предупреждение. '
           'Нажмите "Удалить навсегда" для подтверждения.',
       confirmLabel: 'Удалить навсегда',
-      cancelLabel: 'Отмена',
       isDestructive: true,
     );
 
@@ -449,7 +694,7 @@ class _DangerSection extends ConsumerWidget {
         await ref.read(profileProvider.notifier).deleteAccount();
 
     if (success && context.mounted) {
-      ref.read(authStateProvider.notifier).logout();
+      await ref.read(authStateProvider.notifier).logout();
     } else if (context.mounted) {
       context.showErrorSnackBar('Не удалось удалить аккаунт');
     }

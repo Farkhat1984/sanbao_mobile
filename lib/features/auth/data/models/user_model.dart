@@ -23,6 +23,21 @@ class UserModel {
     this.createdAt,
   });
 
+  /// Creates a [UserModel] from a domain [User] entity.
+  factory UserModel.fromEntity(User user) => UserModel(
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+        role: user.role,
+        locale: user.locale,
+        emailVerified: user.emailVerified,
+        twoFactorEnabled: user.twoFactorEnabled,
+        subscriptionTier: user.subscriptionTier,
+        isBanned: user.isBanned,
+        createdAt: user.createdAt,
+      );
+
   /// Parses a [UserModel] from a JSON map.
   ///
   /// Handles multiple API response shapes (e.g., NextAuth session
@@ -41,7 +56,7 @@ class UserModel {
 
     // Parse subscription tier from nested subscription object
     final subscriptionRaw = json['subscription'];
-    SubscriptionTier subscriptionTier = SubscriptionTier.free;
+    var subscriptionTier = SubscriptionTier.free;
     if (subscriptionRaw is Map<String, Object?>) {
       final plan = subscriptionRaw['plan'];
       if (plan is Map<String, Object?>) {
@@ -135,20 +150,5 @@ class UserModel {
         subscriptionTier: subscriptionTier,
         isBanned: isBanned,
         createdAt: createdAt,
-      );
-
-  /// Creates a [UserModel] from a domain [User] entity.
-  factory UserModel.fromEntity(User user) => UserModel(
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        image: user.image,
-        role: user.role,
-        locale: user.locale,
-        emailVerified: user.emailVerified,
-        twoFactorEnabled: user.twoFactorEnabled,
-        subscriptionTier: user.subscriptionTier,
-        isBanned: user.isBanned,
-        createdAt: user.createdAt,
       );
 }

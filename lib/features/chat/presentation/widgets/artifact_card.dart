@@ -80,7 +80,7 @@ class _ArtifactCardState extends State<ArtifactCard>
         ).animate(CurvedAnimation(
           parent: _enterController,
           curve: SanbaoAnimations.smoothCurve,
-        )),
+        ),),
         child: GestureDetector(
           onTap: widget.onOpen,
           child: Container(

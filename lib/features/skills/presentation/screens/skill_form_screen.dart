@@ -60,8 +60,8 @@ class _SkillFormScreenState extends ConsumerState<SkillFormScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final formNotifier = ref.read(skillFormProvider.notifier);
-      formNotifier.initialize(skill: widget.existingSkill);
+      ref.read(skillFormProvider.notifier)
+        .initialize(skill: widget.existingSkill);
 
       final form = ref.read(skillFormProvider);
       _nameController.text = form.name;
@@ -362,7 +362,7 @@ class _SkillFormScreenState extends ConsumerState<SkillFormScreen> {
             ),
           ),
           const SizedBox(height: 6),
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: colors.bgSurfaceAlt,
               borderRadius: SanbaoRadius.md,
@@ -382,12 +382,10 @@ class _SkillFormScreenState extends ConsumerState<SkillFormScreen> {
                   Icons.keyboard_arrow_down,
                   color: colors.textMuted,
                 ),
-                items: _jurisdictionOptions.map((option) {
-                  return DropdownMenuItem(
+                items: _jurisdictionOptions.map((option) => DropdownMenuItem(
                     value: option.code,
                     child: Text(option.label),
-                  );
-                }).toList(),
+                  ),).toList(),
                 onChanged: (value) {
                   ref.read(skillFormProvider.notifier).updateJurisdiction(value);
                 },

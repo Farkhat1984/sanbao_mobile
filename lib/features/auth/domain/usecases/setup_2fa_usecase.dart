@@ -3,8 +3,8 @@
 /// Handles 2FA setup, enable, disable, and verification operations.
 library;
 
-import 'package:sanbao_flutter/core/errors/failure.dart';
 import 'package:sanbao_flutter/core/errors/error_handler.dart';
+import 'package:sanbao_flutter/core/errors/failure.dart';
 import 'package:sanbao_flutter/features/auth/domain/repositories/auth_repository.dart';
 
 /// Manages 2FA setup and verification.

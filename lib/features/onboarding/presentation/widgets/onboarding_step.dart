@@ -58,7 +58,7 @@ class _OnboardingStepState extends State<OnboardingStep>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: SanbaoAnimations.smoothCurve,
-    ));
+    ),);
 
     // Start animation after a brief delay for page transition
     Future<void>.delayed(const Duration(milliseconds: 100), () {

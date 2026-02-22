@@ -4,7 +4,6 @@
 /// Supports hero animation transitions and gesture-based dismissal.
 library;
 
-import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -38,15 +37,13 @@ void showImagePreview(
         heroTag: heroTag,
         title: title,
       ),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
+      transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
           opacity: CurvedAnimation(
             parent: animation,
             curve: SanbaoAnimations.smoothCurve,
           ),
           child: child,
-        );
-      },
+        ),
     ),
   );
 }
@@ -145,6 +142,7 @@ class _ImagePreviewOverlayState extends State<_ImagePreviewOverlay>
       newMatrix = Matrix4.identity();
     } else {
       // Zoom in to 2.5x
+      // ignore: deprecated_member_use
       newMatrix = Matrix4.identity()..scale(2.5, 2.5);
     }
 
@@ -152,8 +150,7 @@ class _ImagePreviewOverlayState extends State<_ImagePreviewOverlay>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.transparent,
       body: GestureDetector(
         onVerticalDragStart: _onVerticalDragStart,
@@ -208,7 +205,6 @@ class _ImagePreviewOverlayState extends State<_ImagePreviewOverlay>
         ),
       ),
     );
-  }
 
   Widget _buildImage() {
     Widget imageWidget;
@@ -241,8 +237,7 @@ class _ImagePreviewOverlayState extends State<_ImagePreviewOverlay>
     return imageWidget;
   }
 
-  Widget _buildErrorPlaceholder() {
-    return Column(
+  Widget _buildErrorPlaceholder() => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
@@ -260,10 +255,8 @@ class _ImagePreviewOverlayState extends State<_ImagePreviewOverlay>
         ),
       ],
     );
-  }
 
-  Widget _buildTopBar(BuildContext context) {
-    return Container(
+  Widget _buildTopBar(BuildContext context) => Container(
       padding: EdgeInsets.only(
         top: context.topPadding + 8,
         left: 8,
@@ -314,5 +307,4 @@ class _ImagePreviewOverlayState extends State<_ImagePreviewOverlay>
         ],
       ),
     );
-  }
 }

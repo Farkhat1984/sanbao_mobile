@@ -8,7 +8,6 @@
 library;
 
 import 'package:flutter/animation.dart';
-import 'package:flutter/physics.dart';
 
 /// Animation constants and curves for the Sanbao design system.
 abstract final class SanbaoAnimations {
@@ -52,21 +51,21 @@ abstract final class SanbaoAnimations {
 
   /// Spring description matching the web design system.
   /// damping: 25, stiffness: 300
-  static final SpringDescription layoutSpring = SpringDescription(
+  static const SpringDescription layoutSpring = SpringDescription(
     mass: 1.0,
     stiffness: 300.0,
     damping: 25.0,
   );
 
   /// Gentle spring for subtle movements.
-  static final SpringDescription gentleSpring = SpringDescription(
+  static const SpringDescription gentleSpring = SpringDescription(
     mass: 1.0,
     stiffness: 200.0,
     damping: 20.0,
   );
 
   /// Snappy spring for quick interactions.
-  static final SpringDescription snappySpring = SpringDescription(
+  static const SpringDescription snappySpring = SpringDescription(
     mass: 1.0,
     stiffness: 400.0,
     damping: 30.0,

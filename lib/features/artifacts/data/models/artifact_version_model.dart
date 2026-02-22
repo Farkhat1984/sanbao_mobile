@@ -17,8 +17,7 @@ class ArtifactVersionModel {
   });
 
   /// Deserializes from a JSON map.
-  factory ArtifactVersionModel.fromJson(Map<String, Object?> json) {
-    return ArtifactVersionModel(
+  factory ArtifactVersionModel.fromJson(Map<String, Object?> json) => ArtifactVersionModel(
       id: json['id'] as String? ?? '',
       versionNumber: json['version'] as int? ??
           json['versionNumber'] as int? ??
@@ -32,18 +31,15 @@ class ArtifactVersionModel {
               : DateTime.now(),
       label: json['label'] as String?,
     );
-  }
 
   /// Creates from a domain entity.
-  factory ArtifactVersionModel.fromEntity(ArtifactVersion entity) {
-    return ArtifactVersionModel(
+  factory ArtifactVersionModel.fromEntity(ArtifactVersion entity) => ArtifactVersionModel(
       id: entity.id,
       versionNumber: entity.versionNumber,
       content: entity.content,
       createdAt: entity.createdAt,
       label: entity.label,
     );
-  }
 
   final String id;
   final int versionNumber;

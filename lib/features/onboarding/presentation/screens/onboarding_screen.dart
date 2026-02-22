@@ -109,8 +109,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   /// Top bar with Skip button (hidden on last page).
-  Widget _buildTopBar(SanbaoColorScheme colors) {
-    return Padding(
+  Widget _buildTopBar(SanbaoColorScheme colors) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -132,11 +131,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ],
       ),
     );
-  }
 
   /// Bottom section with dot indicators and action button.
-  Widget _buildBottomArea(SanbaoColorScheme colors) {
-    return Padding(
+  Widget _buildBottomArea(SanbaoColorScheme colors) => Padding(
       padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -165,49 +162,40 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ],
       ),
     );
-  }
 
   // ---- Step Builders ----
 
   /// Step 1: Welcome with animated compass.
-  Widget _buildWelcomeStep() {
-    return OnboardingStep(
+  Widget _buildWelcomeStep() => OnboardingStep(
       title: 'Добро пожаловать\nв Sanbao',
       subtitle: 'Ваш интеллектуальный помощник для работы с правовыми '
           'документами, анализом и юридическими консультациями.',
       child: _WelcomeIllustration(),
     );
-  }
 
   /// Step 2: AI Chat feature.
-  Widget _buildChatStep() {
-    return OnboardingStep(
+  Widget _buildChatStep() => OnboardingStep(
       title: 'Общайтесь\nс AI ассистентом',
       subtitle: 'Задавайте вопросы на естественном языке, получайте '
           'развернутые ответы с ссылками на законодательство.',
       child: _ChatIllustration(),
     );
-  }
 
   /// Step 3: Agents feature.
-  Widget _buildAgentsStep() {
-    return OnboardingStep(
+  Widget _buildAgentsStep() => OnboardingStep(
       title: 'Выбирайте\nспециализированных агентов',
       subtitle: 'Каждый агент обучен для конкретной области права. '
           'Создавайте собственных агентов под ваши задачи.',
       child: _AgentsIllustration(),
     );
-  }
 
   /// Step 4: Get Started CTA.
-  Widget _buildGetStartedStep() {
-    return OnboardingStep(
+  Widget _buildGetStartedStep() => OnboardingStep(
       title: 'Начните\nпрямо сейчас',
       subtitle: 'Задайте свой первый вопрос и откройте возможности '
           'AI-ассистента для юридической практики.',
       child: _GetStartedIllustration(),
     );
-  }
 }
 
 // ---- Dot Indicators ----
@@ -251,8 +239,7 @@ class _DotIndicators extends StatelessWidget {
 /// Welcome step: Large animated SanbaoCompass with gradient glow.
 class _WelcomeIllustration extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Gradient circle behind compass
@@ -295,7 +282,6 @@ class _WelcomeIllustration extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 /// Chat step: Simulated chat bubble layout.
@@ -323,25 +309,25 @@ class _ChatIllustration extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         // Feature cards
-        FeatureHighlight(
+        const FeatureHighlight(
           icon: Icons.chat_rounded,
           label: 'Диалоги на естественном языке',
           color: SanbaoColors.accent,
-          delay: const Duration(milliseconds: 100),
+          delay: Duration(milliseconds: 100),
         ),
         const SizedBox(height: 8),
-        FeatureHighlight(
+        const FeatureHighlight(
           icon: Icons.gavel_rounded,
           label: 'Ссылки на статьи законов',
           color: SanbaoColors.legalRef,
-          delay: const Duration(milliseconds: 200),
+          delay: Duration(milliseconds: 200),
         ),
         const SizedBox(height: 8),
-        FeatureHighlight(
+        const FeatureHighlight(
           icon: Icons.description_rounded,
           label: 'Генерация документов',
           color: SanbaoColors.success,
-          delay: const Duration(milliseconds: 300),
+          delay: Duration(milliseconds: 300),
         ),
       ],
     );
@@ -358,7 +344,7 @@ class _AgentsIllustration extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Grid of mini agent cards
-        Wrap(
+        const Wrap(
           spacing: 12,
           runSpacing: 12,
           alignment: WrapAlignment.center,
@@ -367,25 +353,25 @@ class _AgentsIllustration extends StatelessWidget {
               icon: Icons.gavel_rounded,
               label: 'Юрист',
               color: SanbaoColors.legalRef,
-              delay: const Duration(milliseconds: 60),
+              delay: Duration(milliseconds: 60),
             ),
             _MiniAgentCard(
               icon: Icons.account_balance_rounded,
               label: 'Финансы',
               color: SanbaoColors.accent,
-              delay: const Duration(milliseconds: 120),
+              delay: Duration(milliseconds: 120),
             ),
             _MiniAgentCard(
               icon: Icons.description_rounded,
               label: 'Документы',
               color: SanbaoColors.success,
-              delay: const Duration(milliseconds: 180),
+              delay: Duration(milliseconds: 180),
             ),
             _MiniAgentCard(
               icon: Icons.search_rounded,
               label: 'Поиск',
               color: SanbaoColors.info,
-              delay: const Duration(milliseconds: 240),
+              delay: Duration(milliseconds: 240),
             ),
           ],
         ),
@@ -505,10 +491,7 @@ class _MiniAgentCardState extends State<_MiniAgentCard>
 /// Get Started step: Animated gradient icon with sparkle effect.
 class _GetStartedIllustration extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    final colors = context.sanbaoColors;
-
-    return Column(
+  Widget build(BuildContext context) => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Rocket/launch icon with gradient
@@ -536,20 +519,19 @@ class _GetStartedIllustration extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         // Summary features
-        FeatureHighlight(
+        const FeatureHighlight(
           icon: Icons.bolt_rounded,
           label: 'Мгновенные ответы',
           color: SanbaoColors.warning,
-          delay: const Duration(milliseconds: 100),
+          delay: Duration(milliseconds: 100),
         ),
         const SizedBox(height: 8),
-        FeatureHighlight(
+        const FeatureHighlight(
           icon: Icons.security_rounded,
           label: 'Безопасность данных',
           color: SanbaoColors.success,
-          delay: const Duration(milliseconds: 200),
+          delay: Duration(milliseconds: 200),
         ),
       ],
     );
-  }
 }

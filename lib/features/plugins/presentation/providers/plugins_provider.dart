@@ -7,7 +7,6 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/features/plugins/data/repositories/plugin_repository_impl.dart';
 import 'package:sanbao_flutter/features/plugins/domain/entities/plugin.dart';
-import 'package:sanbao_flutter/features/plugins/domain/repositories/plugin_repository.dart';
 
 // ---- Plugins List ----
 
@@ -90,7 +89,7 @@ class PluginsListNotifier extends AsyncNotifier<List<Plugin>> {
     state = AsyncData(
       current
           .map((p) =>
-              p.id == id ? p.copyWith(isEnabled: !p.isEnabled) : p)
+              p.id == id ? p.copyWith(isEnabled: !p.isEnabled) : p,)
           .toList(),
     );
 
@@ -102,7 +101,7 @@ class PluginsListNotifier extends AsyncNotifier<List<Plugin>> {
       state = AsyncData(
         (state.valueOrNull ?? [])
             .map((p) =>
-                p.id == id ? p.copyWith(isEnabled: plugin.isEnabled) : p)
+                p.id == id ? p.copyWith(isEnabled: plugin.isEnabled) : p,)
             .toList(),
       );
     }
@@ -143,7 +142,7 @@ final filteredPluginsProvider =
         .where((p) =>
             query.isEmpty ||
             p.name.toLowerCase().contains(query) ||
-            (p.description?.toLowerCase().contains(query) ?? false))
+            (p.description?.toLowerCase().contains(query) ?? false),)
         .toList(),
   );
 });

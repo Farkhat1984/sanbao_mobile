@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sanbao_flutter/core/theme/animations.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
-import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/theme/typography.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/widgets/sanbao_badge.dart';
@@ -51,7 +50,7 @@ class CodePreview extends StatelessWidget {
     final colors = context.sanbaoColors;
     final lines = code.split('\n');
 
-    return Container(
+    return ColoredBox(
       color: colors.bgSurfaceAlt,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -74,16 +73,14 @@ class CodePreview extends StatelessWidget {
                   child: IntrinsicWidth(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: List.generate(lines.length, (index) {
-                        return _CodeLine(
+                      children: List.generate(lines.length, (index) => _CodeLine(
                           lineNumber: index + 1,
                           text: lines[index],
                           totalLines: lines.length,
                           showLineNumbers: showLineNumbers,
                           fontSize: fontSize,
                           colors: colors,
-                        );
-                      }),
+                        ),),
                     ),
                   ),
                 ),
@@ -126,8 +123,7 @@ class _CodeHeaderState extends State<_CodeHeader> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: widget.colors.bgSurfaceHover,
@@ -144,7 +140,6 @@ class _CodeHeaderState extends State<_CodeHeader> {
           if (widget.language != null && widget.language!.isNotEmpty)
             SanbaoBadge(
               label: _formatLanguage(widget.language!),
-              variant: SanbaoBadgeVariant.accent,
               size: SanbaoBadgeSize.small,
               icon: Icons.code_rounded,
             ),
@@ -211,7 +206,6 @@ class _CodeHeaderState extends State<_CodeHeader> {
         ],
       ),
     );
-  }
 
   /// Formats a language identifier for display.
   String _formatLanguage(String lang) => switch (lang.toLowerCase()) {

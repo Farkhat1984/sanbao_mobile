@@ -122,12 +122,10 @@ class AgentRemoteDataSource {
   /// `icon`, `iconColor`.
   Future<Map<String, Object?>> generateAgent({
     required String description,
-  }) async {
-    return _dioClient.post<Map<String, Object?>>(
+  }) async => _dioClient.post<Map<String, Object?>>(
       '${AppConfig.agentsEndpoint}/generate',
       data: {'description': description},
     );
-  }
 }
 
 /// Riverpod provider for [AgentRemoteDataSource].

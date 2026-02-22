@@ -126,7 +126,6 @@ class _GradientBorderPainter extends CustomPainter {
       startAngle: angle,
       endAngle: angle + 2 * math.pi,
       colors: colors,
-      tileMode: TileMode.clamp,
     );
 
     final paint = Paint()

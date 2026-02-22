@@ -126,7 +126,6 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final result = await _remote.signInWithApple(
         identityToken: params.identityToken,
-        authorizationCode: params.authorizationCode,
         email: params.email,
         fullName: params.fullName,
         nonce: params.nonce,
@@ -336,7 +335,6 @@ class AuthRepositoryImpl implements AuthRepository {
           role: cached.role,
           locale: cached.locale,
           emailVerified: cached.emailVerified,
-          twoFactorEnabled: false,
           subscriptionTier: cached.subscriptionTier,
           isBanned: cached.isBanned,
           createdAt: cached.createdAt,

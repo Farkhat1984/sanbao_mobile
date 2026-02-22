@@ -121,15 +121,14 @@ class _SkillCardState extends State<SkillCard>
           ),
           const Spacer(),
           if (skill.isBuiltIn)
-            SanbaoBadge(
+            const SanbaoBadge(
               label: 'Встроенный',
               variant: SanbaoBadgeVariant.neutral,
               size: SanbaoBadgeSize.small,
             ),
           if (!skill.isBuiltIn && skill.isPublic)
-            SanbaoBadge(
+            const SanbaoBadge(
               label: 'Публичный',
-              variant: SanbaoBadgeVariant.accent,
               size: SanbaoBadgeSize.small,
             ),
         ],

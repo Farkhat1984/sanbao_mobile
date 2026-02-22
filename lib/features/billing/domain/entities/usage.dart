@@ -141,7 +141,7 @@ class PaymentHistoryItem {
   String get formattedAmount {
     final currencySymbol = switch (currency.toUpperCase()) {
       'RUB' => '\u20BD',
-      'USD' => '\$',
+      'USD' => r'$',
       'EUR' => '\u20AC',
       _ => currency,
     };

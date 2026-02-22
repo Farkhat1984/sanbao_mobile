@@ -47,6 +47,7 @@ class _SkillListScreenState extends ConsumerState<SkillListScreen>
     super.dispose();
   }
 
+  // ignore: use_setters_to_change_properties
   void _onSearchChanged(String query) {
     ref.read(skillsSearchQueryProvider.notifier).state = query;
   }
@@ -194,7 +195,7 @@ class _MySkillsTab extends ConsumerWidget {
     final skillsAsync = ref.watch(filteredSkillsProvider);
 
     return skillsAsync.when(
-      loading: () => _SkillGridSkeleton(),
+      loading: _SkillGridSkeleton.new,
       error: (error, _) => EmptyState.error(
         message: 'Не удалось загрузить навыки',
         onRetry: () => ref.read(skillsListProvider.notifier).refresh(),
@@ -252,7 +253,7 @@ class _MarketplaceTab extends ConsumerWidget {
     final skillsAsync = ref.watch(filteredPublicSkillsProvider);
 
     return skillsAsync.when(
-      loading: () => _SkillGridSkeleton(),
+      loading: _SkillGridSkeleton.new,
       error: (error, _) => EmptyState.error(
         message: 'Не удалось загрузить маркетплейс',
         onRetry: () => ref.read(publicSkillsProvider.notifier).refresh(),

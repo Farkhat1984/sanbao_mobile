@@ -7,7 +7,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/theme/typography.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
@@ -70,7 +69,6 @@ class LegalRefBadge extends StatelessWidget {
               displayText,
               style: SanbaoTypography.legalCodeStyle(
                 color: colors.legalRef,
-                fontSize: 12,
               ),
             ),
           ],

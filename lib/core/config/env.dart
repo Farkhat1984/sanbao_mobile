@@ -20,13 +20,11 @@ abstract final class Env {
   /// Sentry DSN for error tracking. Empty disables Sentry.
   static const String sentryDsn = String.fromEnvironment(
     'SENTRY_DSN',
-    defaultValue: '',
   );
 
   /// Google OAuth client ID for sign-in.
   static const String googleClientId = String.fromEnvironment(
     'GOOGLE_CLIENT_ID',
-    defaultValue: '',
   );
 
   /// Current environment: development, staging, production.
@@ -53,6 +51,5 @@ abstract final class Env {
   /// Whether to enable debug logging.
   static const bool enableDebugLogging = bool.fromEnvironment(
     'DEBUG_LOGGING',
-    defaultValue: false,
   );
 }

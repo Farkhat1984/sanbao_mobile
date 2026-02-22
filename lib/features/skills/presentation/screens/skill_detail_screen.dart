@@ -235,15 +235,14 @@ class _SkillDetailContent extends StatelessWidget {
                   runSpacing: 4,
                   children: [
                     if (skill.isBuiltIn)
-                      SanbaoBadge(
+                      const SanbaoBadge(
                         label: 'Встроенный',
                         variant: SanbaoBadgeVariant.neutral,
                         size: SanbaoBadgeSize.small,
                       ),
                     if (skill.isPublic)
-                      SanbaoBadge(
+                      const SanbaoBadge(
                         label: 'Публичный',
-                        variant: SanbaoBadgeVariant.accent,
                         size: SanbaoBadgeSize.small,
                       ),
                     if (skill.isLegal && skill.jurisdictionLabel != null)
@@ -498,7 +497,7 @@ class _DetailSkeleton extends StatelessWidget {
                         height: 20,
                       ),
                       const SizedBox(height: 8),
-                      const SanbaoSkeleton.line(height: 14),
+                      const SanbaoSkeleton.line(),
                     ],
                   ),
                 ),

@@ -4,15 +4,13 @@
 /// repositories, providers, screens, and widgets.
 library;
 
-// Domain
-export 'domain/entities/tool.dart';
-export 'domain/repositories/tool_repository.dart';
-
 // Data
 export 'data/datasources/tool_remote_datasource.dart';
 export 'data/models/tool_model.dart';
 export 'data/repositories/tool_repository_impl.dart';
-
+// Domain
+export 'domain/entities/tool.dart';
+export 'domain/repositories/tool_repository.dart';
 // Presentation
 export 'presentation/providers/tools_provider.dart';
 export 'presentation/screens/tool_form_screen.dart';

@@ -5,9 +5,9 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
+import 'package:shimmer/shimmer.dart';
 
 /// A shimmer-animated skeleton placeholder.
 class SanbaoSkeleton extends StatelessWidget {
@@ -87,7 +87,7 @@ class SanbaoConversationSkeleton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            const SanbaoSkeleton.circle(size: 40),
+            const SanbaoSkeleton.circle(),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

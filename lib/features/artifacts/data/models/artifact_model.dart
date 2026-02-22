@@ -30,7 +30,7 @@ class ArtifactModel {
     final versionsJson = json['versions'] as List<Object?>?;
     final versions = versionsJson
             ?.map((v) =>
-                ArtifactVersionModel.fromJson(v! as Map<String, Object?>))
+                ArtifactVersionModel.fromJson(v! as Map<String, Object?>),)
             .toList() ??
         const [];
 
@@ -56,8 +56,7 @@ class ArtifactModel {
   }
 
   /// Creates from a domain entity.
-  factory ArtifactModel.fromEntity(FullArtifact entity) {
-    return ArtifactModel(
+  factory ArtifactModel.fromEntity(FullArtifact entity) => ArtifactModel(
       id: entity.id,
       conversationId: entity.conversationId,
       messageId: entity.messageId,
@@ -72,7 +71,6 @@ class ArtifactModel {
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
-  }
 
   final String id;
   final String? conversationId;

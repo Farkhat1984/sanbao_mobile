@@ -37,6 +37,7 @@ class _McpListScreenState extends ConsumerState<McpListScreen> {
     super.dispose();
   }
 
+  // ignore: use_setters_to_change_properties
   void _onSearchChanged(String query) {
     ref.read(mcpSearchQueryProvider.notifier).state = query;
   }
@@ -103,7 +104,7 @@ class _McpListScreenState extends ConsumerState<McpListScreen> {
       ),
     );
 
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       await ref.read(mcpServersProvider.notifier).deleteServer(server.id);
       if (mounted) {
         context.showSnackBar('Сервер "${server.name}" удален');
@@ -265,7 +266,7 @@ class _McpListSkeleton extends StatelessWidget {
             3,
             (index) => const Padding(
               padding: EdgeInsets.only(bottom: 12),
-              child: SanbaoSkeleton.box(height: 120),
+              child: SanbaoSkeleton.box(),
             ),
           ),
         ),

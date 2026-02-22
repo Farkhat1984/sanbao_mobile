@@ -16,6 +16,13 @@ class TokenModel {
     required this.expiresAt,
   });
 
+  /// Creates a [TokenModel] from a domain [AuthToken] entity.
+  factory TokenModel.fromEntity(AuthToken token) => TokenModel(
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+        expiresAt: token.expiresAt,
+      );
+
   /// Parses a [TokenModel] from a JSON map.
   ///
   /// Supports both `expiresAt` (ISO string) and `expiresIn` (seconds)
@@ -62,12 +69,5 @@ class TokenModel {
         accessToken: accessToken,
         refreshToken: refreshToken,
         expiresAt: expiresAt,
-      );
-
-  /// Creates a [TokenModel] from a domain [AuthToken] entity.
-  factory TokenModel.fromEntity(AuthToken token) => TokenModel(
-        accessToken: token.accessToken,
-        refreshToken: token.refreshToken,
-        expiresAt: token.expiresAt,
       );
 }

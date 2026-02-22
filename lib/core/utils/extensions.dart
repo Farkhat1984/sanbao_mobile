@@ -192,7 +192,6 @@ extension ContextExtension on BuildContext {
         SnackBar(
           content: Text(message),
           backgroundColor: sanbaoColors.error,
-          duration: const Duration(seconds: 4),
         ),
       );
   }

@@ -4,19 +4,17 @@
 /// repositories, providers, screens, and widgets.
 library;
 
-// Domain
-export 'domain/entities/plan.dart';
-export 'domain/entities/subscription.dart';
-export 'domain/entities/usage.dart';
-export 'domain/repositories/billing_repository.dart';
-
 // Data
 export 'data/datasources/billing_remote_datasource.dart';
 export 'data/models/plan_model.dart';
 export 'data/models/subscription_model.dart';
 export 'data/models/usage_model.dart';
 export 'data/repositories/billing_repository_impl.dart';
-
+// Domain
+export 'domain/entities/plan.dart';
+export 'domain/entities/subscription.dart';
+export 'domain/entities/usage.dart';
+export 'domain/repositories/billing_repository.dart';
 // Presentation
 export 'presentation/providers/billing_provider.dart';
 export 'presentation/screens/billing_screen.dart';

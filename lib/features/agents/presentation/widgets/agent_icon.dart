@@ -97,6 +97,11 @@ class AgentIcon extends StatelessWidget {
         'ShieldCheck' => Icons.verified_user_outlined,
         'ClipboardCheck' => Icons.assignment_turned_in_outlined,
         'Brain' => Icons.psychology_outlined,
+        'Wrench' => Icons.build_outlined,
+        'AlertTriangle' => Icons.warning_amber_outlined,
+        'BarChart3' => Icons.bar_chart_outlined,
+        'CheckCircle' => Icons.check_circle_outlined,
+        'Search' => Icons.search_outlined,
         'Triangle' => Icons.change_history_outlined,
         'Sparkles' => Icons.auto_awesome_outlined,
         _ => Icons.smart_toy_outlined,
@@ -108,6 +113,7 @@ class AgentIcon extends StatelessWidget {
     'FileText', 'Building', 'User', 'HeartPulse', 'GraduationCap',
     'Landmark', 'Code', 'MessageSquare', 'Globe', 'Lightbulb',
     'FileSearch', 'ShieldCheck', 'ClipboardCheck', 'Brain',
+    'Wrench', 'AlertTriangle', 'BarChart3', 'CheckCircle', 'Search',
     'Triangle', 'Sparkles',
   ];
 

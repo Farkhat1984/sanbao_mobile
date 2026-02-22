@@ -4,7 +4,8 @@
 /// Uses image_picker for camera/gallery and file_picker for documents.
 library;
 
-import 'dart:typed_data';
+
+import 'dart:async';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -46,14 +47,12 @@ class PickedFileResult {
 /// Returns a list of [PickedFileResult] or `null` if cancelled.
 Future<List<PickedFileResult>?> showFilePickerSheet(
   BuildContext context,
-) async {
-  return showModalBottomSheet<List<PickedFileResult>>(
+) async => showModalBottomSheet<List<PickedFileResult>>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (context) => const _FilePickerSheet(),
   );
-}
 
 class _FilePickerSheet extends StatelessWidget {
   const _FilePickerSheet();
@@ -63,7 +62,7 @@ class _FilePickerSheet extends StatelessWidget {
     final colors = context.sanbaoColors;
     final bottomPadding = context.bottomPadding;
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.bgSurface,
         borderRadius: const BorderRadius.only(
@@ -150,7 +149,7 @@ class _FilePickerSheet extends StatelessWidget {
   }
 
   Future<void> _pickFromCamera(BuildContext context) async {
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
 
     try {
       final picker = ImagePicker();
@@ -189,7 +188,7 @@ class _FilePickerSheet extends StatelessWidget {
   }
 
   Future<void> _pickFromGallery(BuildContext context) async {
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
 
     try {
       final picker = ImagePicker();
@@ -214,7 +213,7 @@ class _FilePickerSheet extends StatelessWidget {
           mimeType: _guessMimeType(image.name, 'image/jpeg'),
           bytes: bytes,
           path: image.path,
-        ));
+        ),);
       }
 
       if (context.mounted) Navigator.of(context).pop(results);
@@ -231,7 +230,7 @@ class _FilePickerSheet extends StatelessWidget {
   }
 
   Future<void> _pickDocuments(BuildContext context) async {
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
 
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -266,7 +265,7 @@ class _FilePickerSheet extends StatelessWidget {
           mimeType: _guessMimeType(file.name, 'application/octet-stream'),
           bytes: file.bytes!,
           path: file.path,
-        ));
+        ),);
       }
 
       if (context.mounted) Navigator.of(context).pop(results);
@@ -332,7 +331,6 @@ class _PickerOption extends StatelessWidget {
           borderRadius: SanbaoRadius.lg,
           border: Border.all(
             color: color.withValues(alpha: 0.15),
-            width: 1,
           ),
         ),
         child: Column(

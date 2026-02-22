@@ -189,20 +189,22 @@ class AuthRemoteDataSource {
     }
   }
 
-  /// Refreshes the access token using a refresh token.
+  /// Refreshes the access token using the current token.
   ///
-  /// Returns the new token pair.
+  /// Backend accepts `{token}` in body or Authorization header.
+  /// Returns `{token, user, expiresAt}` (Bearer format).
   Future<TokenModel> refreshToken({required String refreshToken}) async {
     final response = await _dioClient.post<Map<String, Object?>>(
       '$_basePath/refresh',
-      data: {'refreshToken': refreshToken},
+      data: {'token': refreshToken},
     );
 
-    return TokenModel.fromJson(response);
+    return _parseBearerTokenResponse(response);
   }
 
   /// Retrieves the authenticated user's profile.
   ///
+  /// Backend returns `{user: {...}}`.
   /// Requires a valid access token in the Authorization header
   /// (handled automatically by [AuthInterceptor]).
   Future<UserModel> getCurrentUser() async {
@@ -210,7 +212,8 @@ class AuthRemoteDataSource {
       '$_basePath/me',
     );
 
-    return UserModel.fromJson(response);
+    final userJson = response['user'] as Map<String, Object?>? ?? response;
+    return UserModel.fromJson(userJson);
   }
 
   /// Retrieves the 2FA setup data.

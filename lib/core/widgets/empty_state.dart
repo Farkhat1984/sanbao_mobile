@@ -5,8 +5,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
-import 'package:sanbao_flutter/core/widgets/sanbao_button.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
+import 'package:sanbao_flutter/core/widgets/sanbao_button.dart';
 
 /// A placeholder widget for empty lists, search results, etc.
 class EmptyState extends StatelessWidget {
@@ -45,8 +45,7 @@ class EmptyState extends StatelessWidget {
 
   /// Creates an empty state for an error.
   factory EmptyState.error({
-    Key? key,
-    required String message,
+    required String message, Key? key,
     VoidCallback? onRetry,
   }) =>
       EmptyState(
@@ -135,7 +134,6 @@ class EmptyState extends StatelessWidget {
                 label: actionLabel!,
                 onPressed: onAction,
                 variant: SanbaoButtonVariant.secondary,
-                size: SanbaoButtonSize.medium,
               ),
             ],
           ],

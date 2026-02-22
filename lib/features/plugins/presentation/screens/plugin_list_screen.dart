@@ -32,6 +32,7 @@ class _PluginListScreenState extends ConsumerState<PluginListScreen> {
     super.dispose();
   }
 
+  // ignore: use_setters_to_change_properties
   void _onSearchChanged(String query) {
     ref.read(pluginsSearchQueryProvider.notifier).state = query;
   }
@@ -249,7 +250,6 @@ class _PluginCard extends StatelessWidget {
                         if (plugin.tools.isNotEmpty)
                           SanbaoBadge(
                             label: '${plugin.tools.length} инстр.',
-                            variant: SanbaoBadgeVariant.accent,
                             icon: Icons.build_outlined,
                             size: SanbaoBadgeSize.small,
                           ),

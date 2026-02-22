@@ -217,6 +217,18 @@ class _MessageInputState extends ConsumerState<MessageInput>
     final isUploading = ref.watch(isUploadingFilesProvider);
     final bottomPadding = context.bottomPadding;
 
+    // Listen for pending input (from regenerate)
+    ref.listen(pendingInputProvider, (previous, next) {
+      if (next != null && next.isNotEmpty) {
+        _textController.text = next;
+        _textController.selection = TextSelection.collapsed(
+          offset: next.length,
+        );
+        _focusNode.requestFocus();
+        ref.read(pendingInputProvider.notifier).state = null;
+      }
+    });
+
     // Keep send button in sync with attachment changes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateSendButton();

@@ -87,7 +87,7 @@ class _BottomSheetWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.sanbaoColors;
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.bgSurface,
         borderRadius: const BorderRadius.vertical(

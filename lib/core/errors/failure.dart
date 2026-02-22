@@ -17,7 +17,7 @@ library;
 ///   // ...
 /// }
 /// ```
-sealed class Failure {
+sealed class Failure implements Exception {
   const Failure({
     required this.message,
     this.code,
@@ -30,7 +30,20 @@ sealed class Failure {
   final String? code;
 
   @override
-  String toString() => '$runtimeType: $message (code=$code)';
+  String toString() => '$_typeName: $message (code=$code)';
+
+  String get _typeName => switch (this) {
+        ServerFailure() => 'ServerFailure',
+        NetworkFailure() => 'NetworkFailure',
+        TimeoutFailure() => 'TimeoutFailure',
+        AuthFailure() => 'AuthFailure',
+        PermissionFailure() => 'PermissionFailure',
+        RateLimitFailure() => 'RateLimitFailure',
+        ValidationFailure() => 'ValidationFailure',
+        CacheFailure() => 'CacheFailure',
+        NotFoundFailure() => 'NotFoundFailure',
+        UnknownFailure() => 'UnknownFailure',
+      };
 }
 
 /// Server returned an error response.

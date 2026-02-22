@@ -160,7 +160,7 @@ class _PlanCardState extends State<PlanCard>
             ),
           ),
         if (widget.isCurrent)
-          SanbaoBadge(
+          const SanbaoBadge(
             label: 'Текущий',
             variant: SanbaoBadgeVariant.success,
             size: SanbaoBadgeSize.small,
@@ -188,7 +188,7 @@ class _PlanCardState extends State<PlanCard>
     final amount = (widget.plan.price / 100).toStringAsFixed(0);
     final symbol = switch (widget.plan.currency.toUpperCase()) {
       'RUB' => '\u20BD',
-      'USD' => '\$',
+      'USD' => r'$',
       'EUR' => '\u20AC',
       _ => widget.plan.currency,
     };
@@ -259,8 +259,7 @@ class _PlanCardState extends State<PlanCard>
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: widget.plan.features.map((feature) {
-        return Padding(
+      children: widget.plan.features.map((feature) => Padding(
           padding: const EdgeInsets.only(bottom: 6),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,14 +277,13 @@ class _PlanCardState extends State<PlanCard>
               ),
             ],
           ),
-        );
-      }).toList(),
+        ),).toList(),
     );
   }
 
   Widget _buildAction(SanbaoColorScheme colors, bool isGradient) {
     if (widget.isCurrent) {
-      return SanbaoButton(
+      return const SanbaoButton(
         label: 'Текущий план',
         variant: SanbaoButtonVariant.secondary,
         isDisabled: true,

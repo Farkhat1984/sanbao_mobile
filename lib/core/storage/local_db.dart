@@ -4,8 +4,6 @@
 /// and an in-memory fallback on web.
 library;
 
-import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'local_db_native.dart' if (dart.library.html) 'local_db_web.dart'

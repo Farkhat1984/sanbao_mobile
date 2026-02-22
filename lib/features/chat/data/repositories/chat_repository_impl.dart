@@ -31,7 +31,7 @@ class ChatRepositoryImpl implements ChatRepository {
         webSearchEnabled: request.webSearchEnabled,
         planningEnabled: request.planningEnabled,
         attachments: request.attachments
-            .map((a) => _serializeAttachment(a))
+            .map(_serializeAttachment)
             .toList(),
       );
 

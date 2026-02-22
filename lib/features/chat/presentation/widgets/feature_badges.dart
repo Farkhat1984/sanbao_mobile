@@ -1,17 +1,18 @@
 /// Feature toggle badges shown above the message input.
 ///
 /// Displays a horizontal row of tappable pills for toggling
-/// AI features like Thinking, Web Search, and Planning.
+/// AI features like Thinking, Web Search, Planning, and Image Generation.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sanbao_flutter/core/config/app_config.dart';
 import 'package:sanbao_flutter/core/theme/animations.dart';
-import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/features/chat/presentation/providers/chat_provider.dart';
+import 'package:sanbao_flutter/features/image_gen/presentation/screens/image_gen_screen.dart';
 
 /// A row of toggleable feature pills shown above the message input.
 ///
@@ -63,7 +64,59 @@ class FeatureBadges extends ConsumerWidget {
                   !planningEnabled;
             },
           ),
+          if (AppConfig.enableImageGeneration) ...[
+            const SizedBox(width: 8),
+            _ImageGenBadge(),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+/// A badge that opens the image generation sheet when tapped.
+///
+/// Unlike toggle badges, this is an action badge that always has
+/// the same appearance and triggers a modal.
+class _ImageGenBadge extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    const roseColor = Color(0xFFF43F5E);
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        showImageGenSheet(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: roseColor.withValues(alpha: 0.08),
+          borderRadius: SanbaoRadius.full,
+          border: Border.all(
+            color: roseColor.withValues(alpha: 0.2),
+          ),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.auto_awesome_rounded,
+              size: 14,
+              color: roseColor,
+            ),
+            SizedBox(width: 6),
+            Text(
+              'Картинка',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: roseColor,
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -108,7 +161,7 @@ class _FeatureBadge extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: SanbaoRadius.full,
-          border: Border.all(color: borderColor, width: 1),
+          border: Border.all(color: borderColor),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

@@ -186,7 +186,7 @@ class DioClient {
 
     // Extract error message from response body
     final errorBody = response.data;
-    String message = 'Unknown error';
+    var message = 'Unknown error';
     int? limit;
 
     if (errorBody is Map<String, Object?>) {
@@ -247,7 +247,7 @@ class DioClient {
   ApiException _mapBadResponse(DioException e) {
     final statusCode = e.response?.statusCode ?? 0;
     final data = e.response?.data;
-    String message = 'Server error';
+    var message = 'Server error';
 
     if (data is Map<String, Object?>) {
       message = (data['error'] as String?) ?? message;

@@ -41,13 +41,13 @@ abstract final class Validators {
     if (value.length < AppConfig.passwordMinLength) {
       return 'Минимум ${AppConfig.passwordMinLength} символов';
     }
-    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+    if (!RegExp('[A-Z]').hasMatch(value)) {
       return 'Нужна хотя бы одна заглавная буква';
     }
-    if (!RegExp(r'[a-z]').hasMatch(value)) {
+    if (!RegExp('[a-z]').hasMatch(value)) {
       return 'Нужна хотя бы одна строчная буква';
     }
-    if (!RegExp(r'[0-9]').hasMatch(value)) {
+    if (!RegExp('[0-9]').hasMatch(value)) {
       return 'Нужна хотя бы одна цифра';
     }
     return null;
@@ -55,7 +55,7 @@ abstract final class Validators {
 
   /// Validates password confirmation matches.
   static String? Function(String?) confirmPassword(String password) =>
-      (String? value) {
+      (value) {
         if (value == null || value.isEmpty) {
           return 'Подтверждение пароля обязательно';
         }
@@ -75,7 +75,7 @@ abstract final class Validators {
 
   /// Validates minimum length.
   static String? Function(String?) minLength(int min, {String? fieldName}) =>
-      (String? value) {
+      (value) {
         if (value == null || value.trim().isEmpty) {
           return '${fieldName ?? "Поле"} обязательно';
         }
@@ -87,7 +87,7 @@ abstract final class Validators {
 
   /// Validates maximum length.
   static String? Function(String?) maxLength(int max, {String? fieldName}) =>
-      (String? value) {
+      (value) {
         if (value != null && value.length > max) {
           return 'Максимум $max символов';
         }
@@ -121,7 +121,7 @@ abstract final class Validators {
   static String? Function(String?) compose(
     List<String? Function(String?)> validators,
   ) =>
-      (String? value) {
+      (value) {
         for (final validator in validators) {
           final error = validator(value);
           if (error != null) return error;

@@ -7,7 +7,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sanbao_flutter/core/theme/animations.dart';
-import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 
@@ -112,10 +111,10 @@ class _TwoFactorInputState extends State<TwoFactorInput> {
 
   void _handlePaste(String value) {
     // Extract only digits
-    final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
+    final digits = value.replaceAll(RegExp('[^0-9]'), '');
     if (digits.isEmpty) return;
 
-    for (int i = 0; i < _otpLength && i < digits.length; i++) {
+    for (var i = 0; i < _otpLength && i < digits.length; i++) {
       _controllers[i].text = digits[i];
     }
 
@@ -160,9 +159,8 @@ class _TwoFactorInputState extends State<TwoFactorInput> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(_otpLength, (index) {
-            // Add a gap between the 3rd and 4th digit
-            return Row(
+          // Add a gap between the 3rd and 4th digit
+          children: List.generate(_otpLength, (index) => Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (index == 3)
@@ -178,8 +176,8 @@ class _TwoFactorInputState extends State<TwoFactorInput> {
                 if (index < _otpLength - 1 && index != 2)
                   const SizedBox(width: 8),
               ],
-            );
-          }),
+            ),
+          ),
         ),
         if (hasError) ...[
           const SizedBox(height: 8),

@@ -13,7 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sanbao_flutter/core/config/app_config.dart';
 import 'package:sanbao_flutter/core/config/env.dart';
 import 'package:sanbao_flutter/core/config/routes.dart';
@@ -24,6 +23,7 @@ import 'package:sanbao_flutter/core/theme/shadows.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sanbao_flutter/features/auth/presentation/widgets/social_login_button.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 /// The main login screen of the application.
 ///
@@ -59,7 +59,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final googleSignIn = GoogleSignIn(
-        clientId: Env.googleClientId,
+        // serverClientId — Web Client ID from Firebase, needed to get idToken
+        // for backend authentication. On Android, clientId is not needed
+        // (handled by google-services.json). On iOS, the plugin reads
+        // clientId from GoogleService-Info.plist automatically.
+        serverClientId: Env.googleClientId,
         scopes: ['email', 'profile'],
       );
 
@@ -294,9 +298,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'[0-9+\-\s()]')),
                   ],
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: '+7 999 123 45 67',
-                    prefixIcon: const Icon(Icons.phone_outlined),
+                    prefixIcon: Icon(Icons.phone_outlined),
                     border: OutlineInputBorder(
                       borderRadius: SanbaoRadius.md,
                     ),
@@ -319,7 +323,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   style: FilledButton.styleFrom(
                     backgroundColor: const Color(0xFF25D366),
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                       borderRadius: SanbaoRadius.md,
                     ),
                   ),
@@ -412,7 +416,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(6),
                   ],
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: '------',
                     border: OutlineInputBorder(
                       borderRadius: SanbaoRadius.md,
@@ -436,7 +440,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   style: FilledButton.styleFrom(
                     backgroundColor: const Color(0xFF25D366),
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                       borderRadius: SanbaoRadius.md,
                     ),
                   ),

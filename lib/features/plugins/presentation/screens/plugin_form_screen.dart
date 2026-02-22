@@ -203,7 +203,6 @@ class _PluginFormScreenState extends ConsumerState<PluginFormScreen> {
           if (count > 0)
             SanbaoBadge(
               label: '$count',
-              variant: SanbaoBadgeVariant.accent,
               size: SanbaoBadgeSize.small,
             ),
         ],

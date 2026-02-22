@@ -4,15 +4,13 @@
 /// repositories, providers, screens, and widgets.
 library;
 
-// Domain
-export 'domain/entities/skill.dart';
-export 'domain/repositories/skill_repository.dart';
-
 // Data
 export 'data/datasources/skill_remote_datasource.dart';
 export 'data/models/skill_model.dart';
 export 'data/repositories/skill_repository_impl.dart';
-
+// Domain
+export 'domain/entities/skill.dart';
+export 'domain/repositories/skill_repository.dart';
 // Presentation
 export 'presentation/providers/skills_provider.dart';
 export 'presentation/screens/skill_detail_screen.dart';

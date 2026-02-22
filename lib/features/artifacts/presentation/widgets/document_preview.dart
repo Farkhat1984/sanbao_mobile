@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/theme/typography.dart';
@@ -50,7 +51,6 @@ class DocumentPreview extends StatelessWidget {
       child: MarkdownBody(
         data: content,
         selectable: true,
-        shrinkWrap: true,
         onTapLink: (text, href, title) => _handleLink(href),
         styleSheet: _buildProseStyleSheet(colors, textTheme),
         builders: {
@@ -134,7 +134,6 @@ class DocumentPreview extends StatelessWidget {
         // Inline code
         code: SanbaoTypography.codeStyle(
           color: colors.accent,
-          fontSize: 13,
         ).copyWith(
           backgroundColor: colors.bgSurfaceAlt,
         ),
@@ -194,7 +193,6 @@ class DocumentPreview extends StatelessWidget {
           border: Border(
             top: BorderSide(
               color: colors.border,
-              width: 1,
             ),
           ),
         ),
@@ -208,7 +206,7 @@ class _ProseCodeBlockBuilder extends MarkdownElementBuilder {
   final SanbaoColorScheme colors;
 
   @override
-  Widget? visitElementAfter(element, TextStyle? preferredStyle) {
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     final textContent = element.textContent;
     String? language;
     if (element.attributes.containsKey('class')) {
@@ -253,7 +251,6 @@ class _ProseCodeBlockBuilder extends MarkdownElementBuilder {
               textContent,
               style: SanbaoTypography.codeStyle(
                 color: colors.textPrimary,
-                fontSize: 13,
               ),
             ),
           ),

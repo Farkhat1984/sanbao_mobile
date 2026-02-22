@@ -4,7 +4,6 @@
 library;
 
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,7 +77,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       );
       state = ProfileSuccess(user: updatedUser);
       // Refresh the auth state with updated user data
-      _ref.read(authStateProvider.notifier).refreshUser();
+      await _ref.read(authStateProvider.notifier).refreshUser();
       return true;
     } on Failure catch (f) {
       state = ProfileError(message: f.message);
@@ -102,7 +101,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         fileName: fileName,
       );
       state = ProfileSuccess(user: updatedUser);
-      _ref.read(authStateProvider.notifier).refreshUser();
+      await _ref.read(authStateProvider.notifier).refreshUser();
       return true;
     } on Failure catch (f) {
       state = ProfileError(message: f.message);

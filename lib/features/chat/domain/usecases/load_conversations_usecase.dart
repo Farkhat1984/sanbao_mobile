@@ -75,7 +75,7 @@ class LoadConversationsUseCase {
       groups.add(ConversationGroup(
         label: 'Закрепленные',
         conversations: pinned,
-      ));
+      ),);
     }
 
     // Group unpinned by date
@@ -93,7 +93,7 @@ class LoadConversationsUseCase {
         groups.add(ConversationGroup(
           label: label,
           conversations: convs,
-        ));
+        ),);
       }
     }
 

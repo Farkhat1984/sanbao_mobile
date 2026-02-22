@@ -290,14 +290,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 /// This is the single source of truth for whether the user is
 /// authenticated. The router watches this for redirect decisions.
 final authStateProvider =
-    StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(
+    StateNotifierProvider<AuthNotifier, AuthState>((ref) => AuthNotifier(
     repository: ref.watch(authRepositoryProvider),
     loginUseCase: ref.watch(loginUseCaseProvider),
     registerUseCase: ref.watch(registerUseCaseProvider),
     logoutUseCase: ref.watch(logoutUseCaseProvider),
-  );
-});
+  ),);
 
 /// Convenience provider that extracts the current user or null.
 final currentUserProvider = Provider<User?>((ref) {

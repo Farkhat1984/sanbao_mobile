@@ -50,9 +50,7 @@ final artifactViewTabProvider = StateProvider<ArtifactViewTab>((ref) {
 /// Set when the user opens an artifact from a message card.
 /// Null when no artifact is being viewed.
 final currentArtifactProvider =
-    StateNotifierProvider<CurrentArtifactNotifier, FullArtifact?>((ref) {
-  return CurrentArtifactNotifier(ref);
-});
+    StateNotifierProvider<CurrentArtifactNotifier, FullArtifact?>(CurrentArtifactNotifier.new);
 
 /// Notifier for the currently displayed artifact.
 class CurrentArtifactNotifier extends StateNotifier<FullArtifact?> {
@@ -96,9 +94,8 @@ class CurrentArtifactNotifier extends StateNotifier<FullArtifact?> {
   }
 
   /// Replaces the current artifact with an updated version from the server.
-  void replace(FullArtifact updated) {
-    state = updated;
-  }
+  // ignore: use_setters_to_change_properties
+  void replace(FullArtifact updated) => state = updated;
 
   /// Closes the artifact viewer.
   void close() {
@@ -133,9 +130,7 @@ final class VersionsError extends VersionsState {
 
 /// Provider for the artifact versions list.
 final artifactVersionsProvider =
-    StateNotifierProvider<ArtifactVersionsNotifier, VersionsState>((ref) {
-  return ArtifactVersionsNotifier(ref);
-});
+    StateNotifierProvider<ArtifactVersionsNotifier, VersionsState>(ArtifactVersionsNotifier.new);
 
 /// Notifier that loads and manages artifact versions.
 class ArtifactVersionsNotifier extends StateNotifier<VersionsState> {
@@ -210,9 +205,7 @@ final class ExportError extends ExportState {
 
 /// Provider for the export operation state.
 final exportProvider =
-    StateNotifierProvider<ExportNotifier, ExportState>((ref) {
-  return ExportNotifier(ref);
-});
+    StateNotifierProvider<ExportNotifier, ExportState>(ExportNotifier.new);
 
 /// Notifier that manages artifact export operations.
 class ExportNotifier extends StateNotifier<ExportState> {
@@ -279,6 +272,4 @@ class ExportNotifier extends StateNotifier<ExportState> {
 // ---- Selected Export Format ----
 
 /// The currently selected export format in the dropdown.
-final selectedExportFormatProvider = StateProvider<ExportFormat>((ref) {
-  return ExportFormat.docx;
-});
+final selectedExportFormatProvider = StateProvider<ExportFormat>((ref) => ExportFormat.docx);

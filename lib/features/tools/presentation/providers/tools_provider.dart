@@ -7,7 +7,6 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sanbao_flutter/features/tools/data/repositories/tool_repository_impl.dart';
 import 'package:sanbao_flutter/features/tools/domain/entities/tool.dart';
-import 'package:sanbao_flutter/features/tools/domain/repositories/tool_repository.dart';
 
 // ---- Tools List ----
 
@@ -90,7 +89,7 @@ class ToolsListNotifier extends AsyncNotifier<List<Tool>> {
     state = AsyncData(
       current
           .map((t) =>
-              t.id == id ? t.copyWith(isEnabled: !t.isEnabled) : t)
+              t.id == id ? t.copyWith(isEnabled: !t.isEnabled) : t,)
           .toList(),
     );
 
@@ -102,7 +101,7 @@ class ToolsListNotifier extends AsyncNotifier<List<Tool>> {
       state = AsyncData(
         (state.valueOrNull ?? [])
             .map((t) =>
-                t.id == id ? t.copyWith(isEnabled: tool.isEnabled) : t)
+                t.id == id ? t.copyWith(isEnabled: tool.isEnabled) : t,)
             .toList(),
       );
     }
@@ -147,7 +146,7 @@ final filteredToolsProvider = Provider<AsyncValue<List<Tool>>>((ref) {
         .where((t) =>
             query.isEmpty ||
             t.name.toLowerCase().contains(query) ||
-            (t.description?.toLowerCase().contains(query) ?? false))
+            (t.description?.toLowerCase().contains(query) ?? false),)
         .toList(),
   );
 });

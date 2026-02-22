@@ -50,9 +50,7 @@ final currentConversationProvider =
 
 /// The message list for the current conversation.
 final messagesProvider =
-    StateNotifierProvider<MessagesNotifier, List<Message>>((ref) {
-  return MessagesNotifier(ref);
-});
+    StateNotifierProvider<MessagesNotifier, List<Message>>(MessagesNotifier.new);
 
 /// State notifier for managing the message list.
 class MessagesNotifier extends StateNotifier<List<Message>> {
@@ -121,6 +119,10 @@ class MessagesNotifier extends StateNotifier<List<Message>> {
     state = [...state.sublist(0, lastIndex), updated];
   }
 
+  /// Replaces the entire message list.
+  // ignore: use_setters_to_change_properties
+  void setMessages(List<Message> messages) => state = messages;
+
   /// Marks the last assistant message as finished (no longer streaming).
   void finishStreaming() {
     if (state.isEmpty) return;
@@ -182,6 +184,15 @@ final streamingToolNameProvider = StateProvider<String?>((ref) => null);
 /// Context usage information from the stream.
 final contextUsageProvider = StateProvider<ContextEvent?>((ref) => null);
 
+// ---- Pending Input (for regenerate) ----
+
+/// Text to pre-fill in the message input (e.g. when regenerating).
+final pendingInputProvider = StateProvider<String?>((ref) => null);
+
+/// Clarification questions from the AI (from `<sanbao-clarify>` tags).
+final clarifyQuestionsProvider =
+    StateProvider<List<ClarifyQuestion>?>((ref) => null);
+
 // ---- AI Feature Toggles ----
 
 /// Whether reasoning/thinking mode is enabled.
@@ -210,9 +221,7 @@ final sendMessageUseCaseProvider = Provider<SendMessageUseCase>((ref) {
 /// 3. Starting the stream
 /// 4. Accumulating content from events
 /// 5. Extracting artifacts on completion
-final chatControllerProvider = Provider<ChatController>((ref) {
-  return ChatController(ref);
-});
+final chatControllerProvider = Provider<ChatController>(ChatController.new);
 
 /// Controls the chat message send flow and stream handling.
 class ChatController {
@@ -253,9 +262,9 @@ class ChatController {
     );
 
     // Add both messages to state
-    final messagesNotifier = _ref.read(messagesProvider.notifier);
-    messagesNotifier.addMessage(userMessage);
-    messagesNotifier.addMessage(assistantMessage);
+    final messagesNotifier = _ref.read(messagesProvider.notifier)
+      ..addMessage(userMessage)
+      ..addMessage(assistantMessage);
 
     // Set streaming state
     _ref.read(isStreamingProvider.notifier).state = true;
@@ -281,13 +290,14 @@ class ChatController {
     final stream = useCase.call(request);
 
     _streamSubscription = stream.listen(
-      (event) => _handleEvent(event),
+      _handleEvent,
       onError: (Object error) {
         messagesNotifier.setError(error.toString());
         _finishStream();
       },
       onDone: () {
         messagesNotifier.finishStreaming();
+        _extractClarifyQuestions();
         _finishStream();
       },
     );
@@ -350,11 +360,34 @@ class ChatController {
     _streamSubscription?.cancel();
     _streamSubscription = null;
 
-    final useCase = _ref.read(sendMessageUseCaseProvider);
-    useCase.stopGeneration();
+    _ref.read(sendMessageUseCaseProvider).stopGeneration();
 
     _ref.read(messagesProvider.notifier).finishStreaming();
     _finishStream();
+  }
+
+  /// Extracts clarify questions from the last assistant message.
+  void _extractClarifyQuestions() {
+    final messages = _ref.read(messagesProvider);
+    if (messages.isEmpty) return;
+
+    final lastMessage = messages.last;
+    if (!lastMessage.isAssistant) return;
+
+    final result =
+        SanbaoTagParser.extractClarifyQuestions(lastMessage.content);
+    if (result.questions.isNotEmpty) {
+      // Update message content to remove clarify tags
+      final messagesNotifier = _ref.read(messagesProvider.notifier);
+      final updated = [...messages];
+      updated[updated.length - 1] = lastMessage.copyWith(
+        content: result.cleanContent,
+      );
+      messagesNotifier.setMessages(updated);
+
+      // Set clarify questions for the UI
+      _ref.read(clarifyQuestionsProvider.notifier).state = result.questions;
+    }
   }
 
   /// Cleans up streaming state.
