@@ -50,7 +50,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   // ---- Google Sign-In ----
 
   Future<void> _handleGoogleSignIn() async {
-    if (!Env.isGoogleSignInEnabled) return;
 
     setState(() {
       _errorMessage = null;
@@ -606,21 +605,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _buildSocialButtons() {
     final showApple = SocialLoginButton.isAppleSignInAvailable;
-    final showGoogle = Env.isGoogleSignInEnabled;
 
     return Column(
       children: [
-        // Google Sign-In
-        if (showGoogle) ...[
-          SocialLoginButton(
-            provider: SocialProvider.google,
-            onPressed: _handleGoogleSignIn,
-            isLoading: _isGoogleLoading,
-            isDisabled: _isAnyLoading && !_isGoogleLoading,
-            label: 'Войти через Google',
-          ),
-          const SizedBox(height: 12),
-        ],
+        // Google Sign-In (always visible)
+        SocialLoginButton(
+          provider: SocialProvider.google,
+          onPressed: _handleGoogleSignIn,
+          isLoading: _isGoogleLoading,
+          isDisabled: _isAnyLoading && !_isGoogleLoading,
+          label: 'Войти через Google',
+        ),
+        const SizedBox(height: 12),
 
         // Apple Sign-In (iOS/macOS per Apple HIG)
         if (showApple) ...[

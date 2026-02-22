@@ -137,6 +137,7 @@ class NdjsonParser {
     final buffer = StringBuffer();
 
     final subscription = byteStream
+        .cast<List<int>>()
         .transform(utf8.decoder)
         .listen(
       (chunk) {
