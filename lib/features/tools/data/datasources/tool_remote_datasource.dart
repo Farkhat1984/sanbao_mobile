@@ -18,11 +18,19 @@ class ToolRemoteDataSource {
 
   /// Fetches all tools for the current user.
   Future<List<Tool>> getAll() async {
-    final response = await _dioClient.get<Map<String, Object?>>(AppConfig.toolsEndpoint);
+    final response = await _dioClient.get<Object>(AppConfig.toolsEndpoint);
 
-    final toolsJson = response['tools'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
+    // API returns a plain list
+    final List<Object?> toolsJson;
+    if (response is List) {
+      toolsJson = response.cast<Object?>();
+    } else if (response is Map<String, Object?>) {
+      toolsJson = response['tools'] as List<Object?>? ??
+          response['data'] as List<Object?>? ??
+          [];
+    } else {
+      toolsJson = [];
+    }
 
     return ToolModel.fromJsonList(toolsJson);
   }

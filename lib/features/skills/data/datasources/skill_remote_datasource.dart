@@ -18,27 +18,43 @@ class SkillRemoteDataSource {
 
   /// Fetches all skills for the current user (built-in + custom).
   Future<List<Skill>> getAll() async {
-    final response = await _dioClient.get<Map<String, Object?>>(
+    final response = await _dioClient.get<Object>(
       AppConfig.skillsEndpoint,
     );
 
-    final skillsJson = response['skills'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
+    // API returns a plain list
+    final List<Object?> skillsJson;
+    if (response is List) {
+      skillsJson = response.cast<Object?>();
+    } else if (response is Map<String, Object?>) {
+      skillsJson = response['skills'] as List<Object?>? ??
+          response['data'] as List<Object?>? ??
+          [];
+    } else {
+      skillsJson = [];
+    }
 
     return SkillModel.fromJsonList(skillsJson);
   }
 
   /// Fetches all public skills available in the marketplace.
   Future<List<Skill>> getPublic() async {
-    final response = await _dioClient.get<Map<String, Object?>>(
+    final response = await _dioClient.get<Object>(
       AppConfig.skillsEndpoint,
       queryParameters: {'public': true},
     );
 
-    final skillsJson = response['skills'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
+    // API returns a plain list
+    final List<Object?> skillsJson;
+    if (response is List) {
+      skillsJson = response.cast<Object?>();
+    } else if (response is Map<String, Object?>) {
+      skillsJson = response['skills'] as List<Object?>? ??
+          response['data'] as List<Object?>? ??
+          [];
+    } else {
+      skillsJson = [];
+    }
 
     return SkillModel.fromJsonList(skillsJson);
   }

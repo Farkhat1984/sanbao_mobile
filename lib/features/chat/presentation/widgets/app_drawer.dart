@@ -9,6 +9,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sanbao_flutter/core/config/routes.dart';
 import 'package:sanbao_flutter/core/theme/colors.dart';
 import 'package:sanbao_flutter/core/theme/radius.dart';
 import 'package:sanbao_flutter/core/utils/extensions.dart';
@@ -131,7 +133,10 @@ class AppDrawer extends ConsumerWidget {
                   ),
                 ),
 
-                // 5. User footer
+                // 5. Feature navigation links
+                const _FeatureNavSection(),
+
+                // 6. User footer
                 UserFooter(
                   onSettingsTap: onSettingsTap,
                   onProfileTap: onProfileTap,
@@ -471,6 +476,110 @@ class _ConversationListSection extends ConsumerWidget {
             child: const Text('Сохранить'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Compact row of feature navigation icons between conversation list and footer.
+class _FeatureNavSection extends StatelessWidget {
+  const _FeatureNavSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.sanbaoColors;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: colors.border, width: 0.5),
+        ),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _NavIcon(
+            icon: Icons.smart_toy_rounded,
+            label: 'Агенты',
+            path: RoutePaths.agents,
+          ),
+          _NavIcon(
+            icon: Icons.auto_fix_high_rounded,
+            label: 'Навыки',
+            path: RoutePaths.skills,
+          ),
+          _NavIcon(
+            icon: Icons.build_rounded,
+            label: 'Инструменты',
+            path: RoutePaths.tools,
+          ),
+          _NavIcon(
+            icon: Icons.extension_rounded,
+            label: 'Плагины',
+            path: RoutePaths.plugins,
+          ),
+          _NavIcon(
+            icon: Icons.dns_rounded,
+            label: 'MCP',
+            path: RoutePaths.mcpServers,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A single navigation icon button in the feature nav row.
+class _NavIcon extends StatelessWidget {
+  const _NavIcon({
+    required this.icon,
+    required this.label,
+    required this.path,
+  });
+
+  final IconData icon;
+  final String label;
+  final String path;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.sanbaoColors;
+
+    return Tooltip(
+      message: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            HapticFeedback.selectionClick();
+            // Close drawer on mobile before navigating
+            final scaffold = Scaffold.maybeOf(context);
+            if (scaffold != null && scaffold.hasDrawer && scaffold.isDrawerOpen) {
+              Navigator.of(context).pop();
+            }
+            context.push(path);
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 20, color: colors.textSecondary),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: colors.textMuted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

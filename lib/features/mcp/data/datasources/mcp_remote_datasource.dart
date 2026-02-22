@@ -18,11 +18,19 @@ class McpRemoteDataSource {
 
   /// Fetches all MCP servers for the current user.
   Future<List<McpServer>> getAll() async {
-    final response = await _dioClient.get<Map<String, Object?>>(AppConfig.mcpServersEndpoint);
+    final response = await _dioClient.get<Object>(AppConfig.mcpServersEndpoint);
 
-    final serversJson = response['servers'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
+    // API returns a plain list
+    final List<Object?> serversJson;
+    if (response is List) {
+      serversJson = response.cast<Object?>();
+    } else if (response is Map<String, Object?>) {
+      serversJson = response['servers'] as List<Object?>? ??
+          response['data'] as List<Object?>? ??
+          [];
+    } else {
+      serversJson = [];
+    }
 
     return McpServerModel.fromJsonList(serversJson);
   }

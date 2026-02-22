@@ -24,15 +24,38 @@ class PluginModel {
         id: json['id'] as String? ?? '',
         name: json['name'] as String? ?? '',
         description: json['description'] as String?,
-        tools: toolsJson?.whereType<String>().toList() ?? const [],
-        skills: skillsJson?.whereType<String>().toList() ?? const [],
-        isEnabled: json['isEnabled'] as bool? ?? true,
+        tools: _extractIds(toolsJson, 'tool'),
+        skills: _extractIds(skillsJson, 'skill'),
+        isEnabled: json['isActive'] as bool? ??
+            json['isEnabled'] as bool? ??
+            true,
         userId: json['userId'] as String?,
         createdAt:
             DateTime.tryParse(json['createdAt'] as String? ?? '') ??
                 DateTime.now(),
       ),
     );
+  }
+
+  /// Extracts IDs from either flat string list or nested junction objects.
+  ///
+  /// Backend may return:
+  /// - `["id1", "id2"]` (flat IDs)
+  /// - `[{tool: {id: "...", name: "..."}}, ...]` (nested junction objects)
+  static List<String> _extractIds(List<Object?>? json, String nestedKey) {
+    if (json == null || json.isEmpty) return const [];
+
+    final ids = <String>[];
+    for (final item in json) {
+      if (item is String) {
+        ids.add(item);
+      } else if (item is Map<String, Object?>) {
+        final nested = item[nestedKey] as Map<String, Object?>?;
+        final id = (nested?['id'] as String?) ?? (item['id'] as String?);
+        if (id != null && id.isNotEmpty) ids.add(id);
+      }
+    }
+    return ids;
   }
 
   /// The underlying domain entity.

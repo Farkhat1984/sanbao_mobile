@@ -18,13 +18,21 @@ class AgentRemoteDataSource {
 
   /// Fetches all agents for the current user (system + user-created).
   Future<List<Agent>> getAll() async {
-    final response = await _dioClient.get<Map<String, Object?>>(
+    final response = await _dioClient.get<Object>(
       AppConfig.agentsEndpoint,
     );
 
-    final agentsJson = response['agents'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
+    // API returns { systemAgents: [...], userAgents: [...] }
+    final List<Object?> agentsJson;
+    if (response is Map<String, Object?>) {
+      final system = response['systemAgents'] as List<Object?>? ?? [];
+      final user = response['userAgents'] as List<Object?>? ?? [];
+      agentsJson = [...system, ...user];
+    } else if (response is List) {
+      agentsJson = response.cast<Object?>();
+    } else {
+      agentsJson = [];
+    }
 
     return AgentModel.fromJsonList(agentsJson);
   }

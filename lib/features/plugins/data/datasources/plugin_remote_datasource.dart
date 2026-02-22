@@ -18,11 +18,19 @@ class PluginRemoteDataSource {
 
   /// Fetches all plugins for the current user.
   Future<List<Plugin>> getAll() async {
-    final response = await _dioClient.get<Map<String, Object?>>(AppConfig.pluginsEndpoint);
+    final response = await _dioClient.get<Object>(AppConfig.pluginsEndpoint);
 
-    final pluginsJson = response['plugins'] as List<Object?>? ??
-        response['data'] as List<Object?>? ??
-        [];
+    // API returns a plain list
+    final List<Object?> pluginsJson;
+    if (response is List) {
+      pluginsJson = response.cast<Object?>();
+    } else if (response is Map<String, Object?>) {
+      pluginsJson = response['plugins'] as List<Object?>? ??
+          response['data'] as List<Object?>? ??
+          [];
+    } else {
+      pluginsJson = [];
+    }
 
     return PluginModel.fromJsonList(pluginsJson);
   }
