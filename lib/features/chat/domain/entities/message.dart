@@ -5,6 +5,7 @@
 /// attachments, and reasoning traces.
 library;
 
+import 'package:sanbao_flutter/features/chat/data/models/chat_event_model.dart';
 import 'package:sanbao_flutter/features/chat/domain/entities/artifact.dart';
 
 /// The role of a message sender.
@@ -78,6 +79,7 @@ class Message {
     this.reasoningContent,
     this.planContent,
     this.artifacts = const [],
+    this.appliedEdits = const [],
     this.attachments = const [],
     this.toolsUsed = const [],
     this.isStreaming = false,
@@ -152,6 +154,9 @@ class Message {
   /// Artifacts (documents, code) embedded in this message.
   final List<Artifact> artifacts;
 
+  /// Edits applied to artifacts in this message (from `<sanbao-edit>` tags).
+  final List<ArtifactEdit> appliedEdits;
+
   /// Files attached to this message.
   final List<MessageAttachment> attachments;
 
@@ -189,6 +194,9 @@ class Message {
   /// Whether this message has artifacts.
   bool get hasArtifacts => artifacts.isNotEmpty;
 
+  /// Whether this message has applied edits.
+  bool get hasEdits => appliedEdits.isNotEmpty;
+
   /// Whether this message has attachments.
   bool get hasAttachments => attachments.isNotEmpty;
 
@@ -201,6 +209,7 @@ class Message {
     String? reasoningContent,
     String? planContent,
     List<Artifact>? artifacts,
+    List<ArtifactEdit>? appliedEdits,
     List<MessageAttachment>? attachments,
     List<String>? toolsUsed,
     bool? isStreaming,
@@ -216,6 +225,7 @@ class Message {
         reasoningContent: reasoningContent ?? this.reasoningContent,
         planContent: planContent ?? this.planContent,
         artifacts: artifacts ?? this.artifacts,
+        appliedEdits: appliedEdits ?? this.appliedEdits,
         attachments: attachments ?? this.attachments,
         toolsUsed: toolsUsed ?? this.toolsUsed,
         isStreaming: isStreaming ?? this.isStreaming,

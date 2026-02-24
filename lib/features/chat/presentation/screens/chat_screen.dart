@@ -319,6 +319,34 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
             );
           },
+          onEditTap: (artifactTitle) {
+            // Find the edited artifact across all messages
+            for (final msg in messages) {
+              final artifact = msg.artifacts
+                  .where(
+                    (a) =>
+                        a.title.toLowerCase() == artifactTitle.toLowerCase(),
+                  )
+                  .firstOrNull;
+              if (artifact != null) {
+                openArtifactViewer(
+                  context: context,
+                  ref: ref,
+                  artifact: full.FullArtifact(
+                    id: artifact.id,
+                    type: full.ArtifactType.fromString(artifact.type.name),
+                    title: artifact.title,
+                    content: artifact.content,
+                    language: artifact.language,
+                    conversationId:
+                        ref.read(currentConversationIdProvider),
+                    messageId: msg.id,
+                  ),
+                );
+                return;
+              }
+            }
+          },
           onLegalReferenceTap: (codeName, article) {
             showLegalArticleSheet(
               context,

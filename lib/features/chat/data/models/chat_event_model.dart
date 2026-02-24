@@ -16,6 +16,18 @@ abstract final class SanbaoTagParser {
     multiLine: true,
   );
 
+  /// Matches `<sanbao-edit target="TARGET">CONTENT</sanbao-edit>`.
+  static final RegExp editPattern = RegExp(
+    r'<sanbao-edit\s+target="([^"]*)">([\s\S]*?)</sanbao-edit>',
+    multiLine: true,
+  );
+
+  /// Matches `<replace><old>OLD</old><new>NEW</new></replace>` within edits.
+  static final RegExp replacePattern = RegExp(
+    r'<replace>\s*<old>([\s\S]*?)</old>\s*<new>([\s\S]*?)</new>\s*</replace>',
+    multiLine: true,
+  );
+
   /// Matches `[ст. NN CODE](article://code_name/NN)` legal reference links.
   static final RegExp legalRefPattern = RegExp(
     r'\[ст\.\s*(\d+(?:\.\d+)?)\s+([^\]]+)\]\(article://([^/]+)/(\d+(?:\.\d+)?)\)',
@@ -119,6 +131,41 @@ abstract final class SanbaoTagParser {
     }
     return refs;
   }
+
+  /// Extracts edit operations from `<sanbao-edit>` tags in content.
+  ///
+  /// Returns a list of [ArtifactEdit] operations (target title +
+  /// search/replace pairs) and the content with edit tags removed.
+  static ({List<ArtifactEdit> edits, String cleanContent}) extractEdits(
+    String content,
+  ) {
+    final edits = <ArtifactEdit>[];
+
+    for (final match in editPattern.allMatches(content)) {
+      final target = match.group(1) ?? '';
+      final editBody = match.group(2) ?? '';
+      final replacements = <EditReplacement>[];
+
+      for (final replaceMatch in replacePattern.allMatches(editBody)) {
+        final oldText = replaceMatch.group(1)?.trim() ?? '';
+        final newText = replaceMatch.group(2)?.trim() ?? '';
+        if (oldText.isNotEmpty) {
+          replacements.add(EditReplacement(oldText: oldText, newText: newText));
+        }
+      }
+
+      if (replacements.isNotEmpty && target.isNotEmpty) {
+        edits.add(ArtifactEdit(target: target, replacements: replacements));
+      }
+    }
+
+    var cleanContent = content;
+    if (edits.isNotEmpty) {
+      cleanContent = content.replaceAll(editPattern, '').trim();
+    }
+
+    return (edits: edits, cleanContent: cleanContent);
+  }
 }
 
 /// A clarification question from the AI, parsed from `<sanbao-clarify>` tags.
@@ -149,4 +196,32 @@ class ClarifyQuestion {
 
   bool get isTextInput => type == 'text';
   bool get isSelect => !isTextInput && options != null && options!.isNotEmpty;
+}
+
+/// A single search/replace operation within an edit.
+class EditReplacement {
+  const EditReplacement({required this.oldText, required this.newText});
+
+  /// The text to find.
+  final String oldText;
+
+  /// The replacement text.
+  final String newText;
+}
+
+/// An edit operation targeting an artifact by title.
+///
+/// Parsed from `<sanbao-edit target="Title">` tags containing
+/// one or more `<replace><old>…</old><new>…</new></replace>` blocks.
+class ArtifactEdit {
+  const ArtifactEdit({required this.target, required this.replacements});
+
+  /// The title of the artifact to modify.
+  final String target;
+
+  /// The list of search/replace operations.
+  final List<EditReplacement> replacements;
+
+  /// Number of individual replacements.
+  int get editCount => replacements.length;
 }

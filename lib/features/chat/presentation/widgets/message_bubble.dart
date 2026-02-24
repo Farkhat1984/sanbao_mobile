@@ -17,6 +17,7 @@ import 'package:sanbao_flutter/core/utils/extensions.dart';
 import 'package:sanbao_flutter/core/utils/formatters.dart';
 import 'package:sanbao_flutter/features/chat/domain/entities/message.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/artifact_card.dart';
+import 'package:sanbao_flutter/features/chat/presentation/widgets/edit_card.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/file_attachment.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/markdown_renderer.dart';
 import 'package:sanbao_flutter/features/chat/presentation/widgets/report_dialog.dart';
@@ -32,6 +33,7 @@ class MessageBubble extends StatefulWidget {
     super.key,
     this.showTimestamp = false,
     this.onArtifactOpen,
+    this.onEditTap,
     this.onLegalReferenceTap,
     this.onCopy,
     this.onRetry,
@@ -47,6 +49,9 @@ class MessageBubble extends StatefulWidget {
 
   /// Callback when an artifact's "Open" button is tapped.
   final void Function(String artifactId)? onArtifactOpen;
+
+  /// Callback when an edit card is tapped (opens the edited artifact).
+  final void Function(String artifactTitle)? onEditTap;
 
   /// Callback when a legal reference link is tapped.
   final void Function(String codeName, String article)? onLegalReferenceTap;
@@ -228,6 +233,15 @@ class _MessageBubbleState extends State<MessageBubble>
                 (artifact) => ArtifactCard(
                   artifact: artifact,
                   onOpen: () => widget.onArtifactOpen?.call(artifact.id),
+                ),
+              ),
+
+            // Edit cards (applied edits to existing artifacts)
+            if (widget.message.hasEdits)
+              ...widget.message.appliedEdits.map(
+                (edit) => EditCard(
+                  edit: edit,
+                  onTap: () => widget.onEditTap?.call(edit.target),
                 ),
               ),
 

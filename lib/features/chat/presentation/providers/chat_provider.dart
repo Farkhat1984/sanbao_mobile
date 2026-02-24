@@ -124,6 +124,10 @@ class MessagesNotifier extends StateNotifier<List<Message>> {
   void setMessages(List<Message> messages) => state = messages;
 
   /// Marks the last assistant message as finished (no longer streaming).
+  ///
+  /// Extracts artifacts from `<sanbao-doc>` tags, applies edits from
+  /// `<sanbao-edit>` tags to existing artifacts, and performs title-based
+  /// deduplication (same title → update content + bump version).
   void finishStreaming() {
     if (state.isEmpty) return;
 
@@ -132,18 +136,138 @@ class MessagesNotifier extends StateNotifier<List<Message>> {
 
     if (!lastMessage.isAssistant) return;
 
-    // Extract artifacts from the final content
-    final result = SanbaoTagParser.extractArtifacts(lastMessage.content);
+    // 1. Extract artifacts from <sanbao-doc> tags
+    final artifactResult =
+        SanbaoTagParser.extractArtifacts(lastMessage.content);
+
+    // 2. Extract edits from <sanbao-edit> tags
+    final editResult = SanbaoTagParser.extractEdits(lastMessage.content);
+
+    // 3. Clean content: remove both artifact and edit tags
+    var cleanContent = artifactResult.cleanContent;
+    if (editResult.edits.isNotEmpty) {
+      cleanContent = SanbaoTagParser.editPattern
+          .allMatches(cleanContent)
+          .isNotEmpty
+          ? cleanContent.replaceAll(SanbaoTagParser.editPattern, '').trim()
+          : cleanContent;
+    }
+
+    // 4. Collect new artifacts (with title-based dedup against older messages)
+    final newArtifacts = artifactResult.artifacts.isNotEmpty
+        ? _deduplicateArtifacts(artifactResult.artifacts)
+        : lastMessage.artifacts;
+
+    // 5. Apply edits to existing artifacts across all messages
+    final appliedEdits = <ArtifactEdit>[];
+    if (editResult.edits.isNotEmpty) {
+      for (final edit in editResult.edits) {
+        final applied = _applyEditToArtifacts(edit);
+        if (applied) {
+          appliedEdits.add(edit);
+        }
+      }
+    }
 
     final updated = lastMessage.copyWith(
       isStreaming: false,
-      content: result.cleanContent,
-      artifacts: result.artifacts.isNotEmpty
-          ? result.artifacts
-          : lastMessage.artifacts,
+      content: cleanContent,
+      artifacts: newArtifacts,
+      appliedEdits: appliedEdits.isNotEmpty ? appliedEdits : null,
     );
 
     state = [...state.sublist(0, lastIndex), updated];
+  }
+
+  /// Applies a single edit operation to artifacts found across all messages.
+  ///
+  /// Searches for the target artifact by title (case-insensitive) and
+  /// applies all search/replace operations to its content.
+  bool _applyEditToArtifacts(ArtifactEdit edit) {
+    final messages = [...state];
+    var applied = false;
+
+    for (var i = 0; i < messages.length; i++) {
+      final message = messages[i];
+      if (!message.isAssistant || message.artifacts.isEmpty) continue;
+
+      final artifactIndex = message.artifacts.indexWhere(
+        (a) => a.title.toLowerCase() == edit.target.toLowerCase(),
+      );
+      if (artifactIndex == -1) continue;
+
+      final artifact = message.artifacts[artifactIndex];
+      var newContent = artifact.content;
+
+      for (final replacement in edit.replacements) {
+        newContent = newContent.replaceAll(
+          replacement.oldText,
+          replacement.newText,
+        );
+      }
+
+      if (newContent != artifact.content) {
+        final updatedArtifacts = [...message.artifacts];
+        updatedArtifacts[artifactIndex] = artifact.copyWith(
+          content: newContent,
+        );
+        messages[i] = message.copyWith(artifacts: updatedArtifacts);
+        applied = true;
+        break; // Apply to first matching artifact only
+      }
+    }
+
+    if (applied) {
+      state = messages;
+    }
+    return applied;
+  }
+
+  /// Deduplicates new artifacts against existing ones by title.
+  ///
+  /// If an artifact with the same title already exists in a previous
+  /// message, updates the existing one instead of creating a duplicate.
+  List<Artifact> _deduplicateArtifacts(List<Artifact> newArtifacts) {
+    final messages = [...state];
+    final result = <Artifact>[];
+    var stateChanged = false;
+
+    for (final artifact in newArtifacts) {
+      var deduplicated = false;
+
+      // Search older messages for same-title artifact
+      for (var i = 0; i < messages.length - 1; i++) {
+        final msg = messages[i];
+        if (!msg.isAssistant || msg.artifacts.isEmpty) continue;
+
+        final existingIndex = msg.artifacts.indexWhere(
+          (a) => a.title.toLowerCase() == artifact.title.toLowerCase(),
+        );
+        if (existingIndex == -1) continue;
+
+        final existing = msg.artifacts[existingIndex];
+        if (existing.content != artifact.content) {
+          // Update existing artifact with new content
+          final updatedArtifacts = [...msg.artifacts];
+          updatedArtifacts[existingIndex] = existing.copyWith(
+            content: artifact.content,
+          );
+          messages[i] = msg.copyWith(artifacts: updatedArtifacts);
+          stateChanged = true;
+        }
+        deduplicated = true;
+        break;
+      }
+
+      if (!deduplicated) {
+        result.add(artifact);
+      }
+    }
+
+    if (stateChanged) {
+      state = messages;
+    }
+    return result.isNotEmpty ? result : const [];
   }
 
   /// Sets an error on the last assistant message.
