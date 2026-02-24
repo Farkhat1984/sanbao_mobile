@@ -14,7 +14,7 @@ abstract final class Env {
   /// The base URL of the Sanbao API server.
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:3000',
+    defaultValue: 'https://www.sanbao.ai',
   );
 
   /// Sentry DSN for error tracking. Empty disables Sentry.

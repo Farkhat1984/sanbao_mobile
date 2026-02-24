@@ -20,8 +20,12 @@ Future<void> main() async {
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      // Initialize Firebase
-      await Firebase.initializeApp();
+      // Initialize Firebase (non-fatal if missing config)
+      try {
+        await Firebase.initializeApp();
+      } catch (e) {
+        debugPrint('[Sanbao] Firebase init failed: $e');
+      }
 
       // Lock orientation to portrait on phones
       await SystemChrome.setPreferredOrientations([
