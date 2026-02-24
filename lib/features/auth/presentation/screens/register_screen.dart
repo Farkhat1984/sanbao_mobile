@@ -122,7 +122,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     try {
       final googleSignIn = GoogleSignIn(
-        clientId: Env.googleClientId,
+        serverClientId: Env.googleClientId,
         scopes: ['email', 'profile'],
       );
 

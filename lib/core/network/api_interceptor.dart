@@ -71,14 +71,16 @@ class AuthInterceptor extends Interceptor {
         throw const TokenRefreshException();
       }
 
+      // Backend expects {token} and returns {token, user, expiresAt}
       final response = await _dio.post<Map<String, Object?>>(
         '${AppConfig.authEndpoint}/refresh',
-        data: {'refreshToken': refreshToken},
+        data: {'token': refreshToken},
         options: Options(extra: {'isRetry': true}),
       );
 
-      final newAccessToken = response.data?['accessToken'] as String?;
-      final newRefreshToken = response.data?['refreshToken'] as String?;
+      // Backend returns single Bearer token as "token"
+      final newAccessToken = response.data?['token'] as String?;
+      final newRefreshToken = response.data?['token'] as String?;
 
       if (newAccessToken == null) {
         throw const TokenRefreshException();

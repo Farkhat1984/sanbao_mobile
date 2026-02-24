@@ -58,9 +58,19 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       return result.user.toEntity();
+    } on ForbiddenException catch (e) {
+      // Backend returns 403 for 2FA-related errors
+      if (e.message.contains('2FA') || e.message.contains('2fa')) {
+        throw const AuthFailure(
+          message: 'Требуется двухфакторная аутентификация',
+          code: '2FA_REQUIRED',
+        );
+      }
+      throw ErrorHandler.toFailure(e);
     } on ValidationException catch (e) {
-      // Check for 2FA required error
+      // Check for 2FA required error (fallback for 400 responses)
       if (e.message.contains('2FA_REQUIRED') ||
+          e.message.contains('2FA') ||
           e.message.contains('2fa_required')) {
         throw const AuthFailure(
           message: 'Требуется двухфакторная аутентификация',
